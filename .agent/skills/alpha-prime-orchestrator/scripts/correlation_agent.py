@@ -1,12 +1,10 @@
 import os
 import pandas as pd
 import numpy as np
+import yfinance as yf
 from datetime import datetime, timedelta
 from sklearn.preprocessing import StandardScaler
 from statsmodels.tsa.stattools import grangercausalitytests
-
-# CCXT for exchange data
-import ccxt
 
 # Transfer Entropy from pyinform (if installed)
 try:
@@ -18,7 +16,7 @@ class CorrelationAgent:
     """Correlation Agent for high‑frequency market analysis.
 
     Responsibilities:
-    1️⃣ Fetch minute‑level OHLCV data via CCXT for selected assets.
+    1️⃣ Fetch minute‑level OHLCV data via yfinance for selected assets (replacing CCXT).
     2️⃣ Compute rolling Pearson correlation matrix (default 120‑minute window).
     3️⃣ Detect lead‑lag relationships using Granger Causality (max lag 5).
     4️⃣ Optionally calculate Transfer Entropy for non‑linear directionality.
@@ -26,48 +24,34 @@ class CorrelationAgent:
     """
 
     def __init__(self):
-        # Initialise CCXT exchange (Binance as default). Keys are optional for public data.
-        self.exchange = ccxt.binance({
-            'enableRateLimit': True,
-            'options': {'defaultType': 'spot'}
-        })
-        # Mapping of logical asset names to exchange symbols
+        # Mapping of logical asset names to yfinance symbols
         self.symbols = {
-            "BTC": "BTC/USDT",
-            "ETH": "ETH/USDT",
-            "SOL": "SOL/USDT",
-            "NASDAQ": "NASDAQ",          # placeholder – will be fetched via yfinance later
-            "GOLD": "XAU/USD",
-            "DXY": "DXY"                # placeholder – via yfinance
+            "BTC": "BTC-USD",
+            "ETH": "ETH-USD",
+            "SOL": "SOL-USD",
+            "NASDAQ": "^IXIC",
+            "GOLD": "GC=F",
+            "DXY": "DX-Y.NYB",
+            "US10Y": "^TNX"
         }
         # Settings
         self.correlation_window = 120  # minutes for rolling correlation
         self.granger_maxlag = 5
 
     # ---------------------------------------------------------------------
-    # Helper: fetch minute‑level OHLCV from CCXT and return a pandas Series of closes
-    # ---------------------------------------------------------------------
-    def _fetch_ccxt_series(self, symbol, timeframe='1m', limit=500):
-        try:
-            ohlcv = self.exchange.fetch_ohlcv(symbol, timeframe=timeframe, limit=limit)
-            df = pd.DataFrame(ohlcv, columns=['timestamp', 'open', 'high', 'low', 'close', 'volume'])
-            # Convert ms timestamp to datetime index
-            df['timestamp'] = pd.to_datetime(df['timestamp'], unit='ms')
-            df.set_index('timestamp', inplace=True)
-            return df['close']
-        except Exception as e:
-            print(f"Error fetching {symbol} from CCXT: {e}")
-            return pd.Series(dtype=float)
-
-    # ---------------------------------------------------------------------
-    # Helper: fetch price series for assets not on CCXT (e.g., Nasdaq, DXY, Gold)
+    # Helper: fetch minute‑level OHLCV from yfinance
     # ---------------------------------------------------------------------
     def _fetch_yf_series(self, ticker, period='2d', interval='1m'):
-        import yfinance as yf
         try:
+            # interval='1m' is restricted to last 7 days; 2d period is safe
             data = yf.download(tickers=ticker, period=period, interval=interval, progress=False)
             if data.empty:
                 return pd.Series(dtype=float)
+            
+            # Use 'Close' column. yfinance sometimes returns a MultiIndex if multiple tickers are passed, 
+            # but here we pass one at a time.
+            if isinstance(data.columns, pd.MultiIndex):
+                return data['Close'][ticker]
             return data['Close']
         except Exception as e:
             print(f"Error fetching {ticker} from Yahoo Finance: {e}")
@@ -78,13 +62,15 @@ class CorrelationAgent:
     # ---------------------------------------------------------------------
     def _build_price_dataframe(self):
         price_series = {}
-        # CCXT assets
-        for name in ["BTC", "ETH", "SOL"]:
-            price_series[name] = self._fetch_ccxt_series(self.symbols[name])
-        # Non‑CCXT assets via yfinance (NASDAQ index, Gold, DXY)
-        price_series["NASDAQ"] = self._fetch_yf_series('^IXIC')
-        price_series["GOLD"] = self._fetch_yf_series('GC=F')
-        price_series["DXY"] = self._fetch_yf_series('DX-Y.NYB')
+        for name, ticker in self.symbols.items():
+            print(f"Fetching {name} ({ticker})...")
+            series = self._fetch_yf_series(ticker)
+            if not series.empty:
+                price_series[name] = series
+        
+        if not price_series:
+            return pd.DataFrame()
+
         # Align all series on the same index (inner join)
         df = pd.concat(price_series, axis=1, join='inner')
         df.dropna(inplace=True)
@@ -94,17 +80,18 @@ class CorrelationAgent:
     # Rolling Pearson correlation over the configured window (in minutes)
     # ---------------------------------------------------------------------
     def _rolling_correlation(self, df):
-        # Resample to minute frequency if needed (already minute)
         corr_matrix = {}
-        window = self.correlation_window
-        # Use rolling apply for each pair
+        window = min(self.correlation_window, len(df))
+        if window < 2:
+            return {}
+
+        # Use rolling correlation for each pair
         for col_a in df.columns:
             for col_b in df.columns:
                 if col_a >= col_b:
                     continue
                 series_a = df[col_a]
                 series_b = df[col_b]
-                # Rolling correlation returns a series; take the latest value
                 rolling_corr = series_a.rolling(window).corr(series_b)
                 latest_corr = rolling_corr.iloc[-1]
                 corr_matrix[f"{col_a}_{col_b}"] = float(latest_corr) if pd.notna(latest_corr) else None
@@ -115,15 +102,20 @@ class CorrelationAgent:
     # ---------------------------------------------------------------------
     def _granger_causality(self, series_a, series_b):
         try:
-            data = pd.concat([series_a, series_b], axis=1).dropna()
+            # We need stationary data for Granger Causality; use pct_change
+            data = pd.concat([series_a.pct_change(), series_b.pct_change()], axis=1).dropna()
             data.columns = ['a', 'b']
+            
+            if len(data) <= self.granger_maxlag * 2:
+                return None
+
             # Test if a Granger‑causes b
             test_result = grangercausalitytests(data[['b', 'a']], maxlag=self.granger_maxlag, verbose=False)
-            # Use the smallest p‑value across lags
+            # Use the smallest p‑value across lags for the ssr_ftest
             pvals = [test_result[lag][0]['ssr_ftest'][1] for lag in range(1, self.granger_maxlag + 1)]
             return min(pvals)
         except Exception as e:
-            print(f"Granger test error: {e}")
+            # print(f"Granger test error: {e}")
             return None
 
     # ---------------------------------------------------------------------
@@ -139,7 +131,6 @@ class CorrelationAgent:
             b_disc = pd.cut(series_b, bins=bins, labels=False).astype(int)
             return float(transfer_entropy(a_disc.tolist(), b_disc.tolist(), k=k))
         except Exception as e:
-            print(f"Transfer entropy error: {e}")
             return None
 
     # ---------------------------------------------------------------------
@@ -148,8 +139,8 @@ class CorrelationAgent:
     def generate(self):
         # 1️⃣ Build aligned price DataFrame
         price_df = self._build_price_dataframe()
-        if price_df.empty:
-            return {"error": "Insufficient data to compute correlations."}
+        if price_df.empty or len(price_df) < 5:
+            return {"error": "Insufficient data to compute correlations. Try again during market hours or check connectivity."}
 
         # 2️⃣ Rolling correlation matrix (latest values)
         corr_matrix = self._rolling_correlation(price_df)
@@ -158,20 +149,22 @@ class CorrelationAgent:
         lead_lag_info = {}
         assets = list(price_df.columns)
         for i, asset_a in enumerate(assets):
-            for asset_b in assets[i+1:]:
+            for asset_b in assets:
+                if asset_a == asset_b:
+                    continue
                 p_val = self._granger_causality(price_df[asset_a], price_df[asset_b])
                 # Simple heuristic: p < 0.05 => A leads B
                 if p_val is not None and p_val < 0.05:
                     lead_lag_info[f"{asset_a}_leads_{asset_b}"] = True
                 else:
                     lead_lag_info[f"{asset_a}_leads_{asset_b}"] = False
+                
                 # Transfer Entropy (if library available)
                 if transfer_entropy:
                     te = self._transfer_entropy(price_df[asset_a], price_df[asset_b])
                     lead_lag_info[f"te_{asset_a}_to_{asset_b}"] = te
 
         # 4️⃣ Decoupling alerts – compare current correlation to historical baseline
-        # For simplicity, compute baseline as mean correlation over the past 24h (1440 minutes)
         baseline_corr = {}
         for col in corr_matrix:
             series_a, series_b = col.split('_')
@@ -184,21 +177,22 @@ class CorrelationAgent:
             base = baseline_corr.get(pair)
             if base is None or curr_corr is None:
                 continue
-            # If correlation magnitude changes sign or drops > 0.5 absolute diff, raise alert
-            if (curr_corr * base) < 0 or abs(curr_corr - base) > 0.5:
+            # If correlation magnitude changes sign or drops > 0.4 absolute diff, raise alert
+            if (curr_corr * base) < 0 or abs(curr_corr - base) > 0.4:
                 decoupling_alerts[pair] = {
-                    "current": curr_corr,
-                    "baseline": base,
-                    "alert": "Decoupling detected"
+                    "current": round(curr_corr, 3),
+                    "baseline": round(base, 3),
+                    "alert": "Significant Decoupling Detected"
                 }
 
         # 5️⃣ Assemble payload
         payload = {
             "timestamp": datetime.utcnow().isoformat() + "Z",
             "correlation_matrix": corr_matrix,
-            "lead_lag": lead_lag_info,
+            "lead_lag_info": lead_lag_info,
             "decoupling_alerts": decoupling_alerts,
-            "price_snapshot": price_df.iloc[-1].to_dict()
+            "price_snapshot": price_df.iloc[-1].to_dict(),
+            "data_points": len(price_df)
         }
         return payload
 
@@ -207,5 +201,7 @@ class CorrelationAgent:
 # ---------------------------------------------------------------------
 if __name__ == "__main__":
     agent = CorrelationAgent()
+    print("Running Correlation Agent (yfinance version)...")
     result = agent.generate()
-    print(result)
+    import json
+    print(json.dumps(result, indent=4))
