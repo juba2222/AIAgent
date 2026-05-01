@@ -3,185 +3,202 @@ import pandas as pd
 import numpy as np
 import yfinance as yf
 from datetime import datetime, timedelta
-from sklearn.cluster import KMeans
-from sklearn.preprocessing import StandardScaler
-from statsmodels.tsa.stattools import grangercausalitytests
+from fredapi import Fred
 
 class MacroAgent:
     """
-    Macro Agent that fetches macro data, normalizes it, detects regime,
-    calculates a Macro Score (0-100), and sets a Veto flag for dangerous confluence.
+    Macro Agent that fetches real macro data from yfinance and FRED,
+    normalizes it using Z-scores, detects market regime,
+    and calculates a Macro Score (0-100).
     """
 
-    def __init__(self):
+    def __init__(self, fred_api_key=None):
         # Configuration
         self.window = 30  # Days for rolling Z-score
+        self.history_period = "6mo" # To get enough data for Z-scores
 
-        # API Endpoints (symbols)
-        self.crypto_symbols = {
-            "US10Y_TLT": "^TNX",   # 10Y Treasury Yield proxy
-        }
-        self.macro_symbols = {
+        # API Symbols
+        self.symbols = {
+            "US10Y": "^TNX",
             "VIX": "^VIX",
-            "DXY": "DX-Y.NYB",
-            "JNK": "JNK",         # High Yield Corporate Bond ETF
-            "LQD": "LQD",         # Investment Grade Corporate Bond ETF
+            "DXY": "DX-Y.NYB", # Primary DXY ticker
+            "HYG": "HYG",      # High Yield Corporate Bond
+            "TLT": "TLT",      # 20+ Year Treasury Bond
+            "SPX": "^GSPC"
+        }
+        
+        # FRED Series IDs
+        self.fred_series = {
+            "M2": "M2SL",
+            "CPI": "CPIAUCSL",
+            "Unemployment": "UNRATE",
+            "FedFunds": "FEDFUNDS"
         }
 
-        # Init API clients (keys loaded from environment)
-        self.fred_api_key = os.getenv('FRED_API_KEY')
-        self.alpaca_api_key = os.getenv('ALPACA_API_KEY')
-        self.alpaca_secret = os.getenv('ALPACA_API_SECRET')
+        # API Keys
+        self.fred_api_key = fred_api_key or os.getenv('FRED_API_KEY') or "b609be7997d67f67cf3d1ac99609128b".strip()
+        self.fred = None
+        if self.fred_api_key:
+            try:
+                self.fred = Fred(api_key=self.fred_api_key)
+            except Exception as e:
+                print(f"Error initializing FRED API: {e}")
 
-        # For now we'll mock data fetching; replace later with real API calls
-
-    def _fetch_latest_price(self, symbol):
-        """Mokup of fetching latest price using yfinance for demonstration."""
+    def _fetch_yf_history(self, ticker):
+        """Fetch historical data from yfinance."""
         try:
-            if symbol.startswith('^'):
-                ticker = yf.Ticker(symbol)
-                hist = ticker.history(period='1d')
-                return hist['Close'].iloc[-1]
-            else:
-                ticker = yf.Ticker(symbol)
-                hist = ticker.history(period='1d')
-                return hist['Close'].iloc[-1]
+            data = yf.download(ticker, period=self.history_period, interval="1d", progress=False)
+            if data.empty:
+                return pd.Series(dtype=float)
+            return data['Close']
         except Exception as e:
-            print(f"Error fetching {symbol}: {e}")
+            print(f"Error fetching history for {ticker}: {e}")
+            return pd.Series(dtype=float)
+
+    def _fetch_fred_latest(self, series_id):
+        """Fetch latest value from FRED."""
+        if not self.fred:
             return None
-
-    def _fetch_fred_series(self, series_name):
-        """Fetch M2 Money Supply series using FRED API (mocked)."""
         try:
-            from fredapi import Fred
-            fred = Fred(api_key=self.fred_api_key)
-            data = fred.get_series(series_name)
-            if len(data) > 0:
-                return data.iloc[-1]
+            data = self.fred.get_series(series_id)
+            if not data.empty:
+                return data.iloc[-1], data.iloc[-2] # Current and previous
         except Exception as e:
-            print(f"Error fetching FRED series {series_name}: {e}")
-        return None
+            print(f"Error fetching FRED series {series_id}: {e}")
+        return None, None
 
-    def _calculate_z_score(self, series_data):
-        """Calculate Z-score using rolling window."""
-        series = pd.Series(series_data, dtype=float)
-        if len(series.dropna()) < self.window:
-            rolling_mean = series.dropna().mean()
-            rolling_std = series.dropna().std()
-        else:
-            rolling_mean = series.rolling(window=self.window).mean()
-            rolling_std = series.rolling(window=self.window).std()
-        z_scores = (series - rolling_mean) / rolling_std
-        z_scores_clipped = z_scores.clip(-3, 3)
-        return z_scores_clipped.dropna()
+    def _calculate_z_score(self, series):
+        """Calculate the latest Z-score of a series."""
+        if len(series) < self.window:
+            return 0.0
+        
+        # Ensure we are working with a 1D series
+        if isinstance(series, pd.DataFrame):
+            series = series.iloc[:, 0]
 
-    def _detect_regime(self, z_scores):
-        """Detect regime based on heuristic mapping of high-dimensional z-scores."""
-        # Simple heuristic: map cluster label to regime name
-        # Since we don't fit KMeans here, fallback to heuristic naming
-        if z_scores.get('DXY', 0) > 1.5 and z_scores.get('VIX', 0) > 1.5 and z_scores.get('US10Y_TLT', 0) > 1.5:
-            return "Geopolitical Panic"
-        elif z_scores.get('DXY', 0) > 1.5 and z_scores.get('VIX', 0) > 1.5:
-            return "Liquidity Shock"
-        elif z_scores.get('DXY', 0) < -1.5 and z_scores.get('US10Y_TLT', 0) < -1.5:
-            return "Deflation"
-        else:
+        mean = series.rolling(window=self.window).mean()
+        std = series.rolling(window=self.window).std()
+        z_scores = (series - mean) / std
+        
+        latest_z = z_scores.iloc[-1]
+        
+        # Handle cases where latest_z is still a series or NaN
+        if isinstance(latest_z, (pd.Series, pd.DataFrame)):
+            latest_z = latest_z.iloc[0]
+            
+        if pd.isna(latest_z):
+            return 0.0
+            
+        # Clip Z-score to [-3, 3]
+        return float(max(-3.0, min(3.0, float(latest_z))))
+
+    def _detect_regime(self, z_scores, macro_data):
+        """
+        Detect Market Regime based on Dynamic Correlation Framework.
+        - Goldilocks: Low VIX, Normal Yield Curve, Low Inflation.
+        - Stagflation: High Inflation (CPI), Rising/High Yields, Negative Yield Curve.
+        - Recession: High VIX, Inverted Yield Curve, Falling yields.
+        - Reflation: Rising Growth, Moderate Inflation.
+        """
+        # Heuristic Logic
+        vix_z = z_scores.get('VIX', 0)
+        dxy_z = z_scores.get('DXY', 0)
+        yield_z = z_scores.get('US10Y', 0)
+        
+        cpi = macro_data.get('CPI', {}).get('value')
+        unrate = macro_data.get('Unemployment', {}).get('value')
+        
+        if vix_z > 1.5:
+            return "Recession/Panic"
+        elif cpi and cpi > 4.0 and yield_z > 1.0:
+            return "Stagflation"
+        elif vix_z < -0.5 and yield_z < 0.5:
             return "Goldilocks"
+        elif yield_z > 1.0 and dxy_z < 0:
+            return "Reflation"
+        else:
+            return "Transition/Neutral"
 
     def _calculate_macro_score(self, z_scores):
-        """Calculate Macro Score from Z-scores (0-100) using linear mapping."""
-        total = 0
-        contributions = {}
-        for key, val in z_scores.items():
-            # Map Z-score range [-3, 3] to contribution [0, 20]
-            contribution = max(0, min(20, (val + 3) * (20 / 6)))
-            contributions[key] = contribution
-            total += contribution
-        return int(total), contributions
-
-    def _check_veto(self, z_scores):
-        """Veto flag = True if all three danger metrics are > 1.5 Z-score."""
-        dangerous = [
-            z_scores.get('DXY', 0) > 1.5,
-            z_scores.get('VIX', 0) > 1.5,
-            z_scores.get('US10Y_TLT', 0) > 1.5
-        ]
-        return all(dangerous)
+        """Calculate a composite Macro Score (0-100)."""
+        # 0 is extremely bearish, 100 is extremely bullish
+        # VIX: high is bad
+        # DXY: high is usually bad for risk
+        # Yields: context dependent, but high volatility is usually bad
+        
+        weights = {
+            'VIX': -30,
+            'DXY': -20,
+            'US10Y': -10,
+            'HYG_TLT': 40 # Credit spread proxy
+        }
+        
+        score = 50 # Baseline
+        for key, z in z_scores.items():
+            weight = weights.get(key, 0)
+            # Map Z [-3, 3] to score impact
+            impact = (z / 3) * weight
+            score += impact
+            
+        return int(max(0, min(100, score)))
 
     def generate(self):
-        """Main entry point: fetch data, compute scores, and return structured result."""
-        # ---- 1. Fetch raw data ----
-        raw_data = {}
-        # Treasury Yield proxy (US10Y)
-        us10y_price = self._fetch_latest_price(self.crypto_symbols["US10Y_TLT"])
-        raw_data["US10Y"] = us10y_price
+        """Main execution logic."""
+        print("MacroAgent: Fetching real market data...")
+        
+        # 1. Fetch yfinance data
+        hist_data = {}
+        z_scores = {}
+        raw_prices = {}
+        
+        for name, ticker in self.symbols.items():
+            series = self._fetch_yf_history(ticker)
+            if not series.empty:
+                hist_data[name] = series
+                z_scores[name] = self._calculate_z_score(series)
+                # Take the last scalar value properly
+                val = series.iloc[-1]
+                if isinstance(val, (pd.Series, pd.DataFrame)):
+                    val = val.iloc[0]
+                raw_prices[name] = float(val)
+        
+        # Calculate Credit Spread Proxy (HYG / TLT)
+        if 'HYG' in hist_data and 'TLT' in hist_data:
+            ratio = hist_data['HYG'] / hist_data['TLT']
+            z_scores['HYG_TLT'] = self._calculate_z_score(ratio)
+            raw_prices['CreditSpreadProxy'] = float(ratio.iloc[-1])
 
-        # VIX
-        vix_price = self._fetch_latest_price(self.macro_symbols["VIX"])
-        raw_data["VIX"] = vix_price
+        # 2. Fetch FRED data
+        print("MacroAgent: Fetching FRED macro indicators...")
+        macro_stats = {}
+        for name, series_id in self.fred_series.items():
+            curr, prev = self._fetch_fred_latest(series_id)
+            if curr is not None:
+                macro_stats[name] = {
+                    "value": float(curr),
+                    "previous": float(prev),
+                    "change": float(curr - prev) if prev else 0
+                }
 
-        # DXY
-        dxy_price = self._fetch_latest_price(self.macro_symbols["DXY"])
-        raw_data["DXY"] = dxy_price
-
-        # Credit Spread (JNK - LQD)
-        jnk_price = self._fetch_latest_price(self.macro_symbols["JNK"])
-        lqd_price = self._fetch_latest_price(self.macro_symbols["LQD"])
-        raw_data["CreditSpread"] = jnk_price - lqd_price if jnk_price and lqd_price else None
-
-        # M2 Money Supply (mock)
-        m2_supply = self._fetch_fred_series('M2SL')
-        raw_data["M2"] = m2_supply
-
-        # ---- 2. Build time series for Z-score calculations ----
-        # For demonstration, we will simulate a short series of last 100 daily returns
-        # In production, store historical values (e.g., in DB or file)
-        def simulate_series(value, period=100, delta=None):
-            series = [value]
-            for _ in range(period-1):
-                change = np.random.normal(delta) if delta else 0
-                series.append(max(0, series[-1] * (1 + change)))
-            return series[:period]
-
-        # Create a small synthetic series for each metric to compute Z-scores
-        series_len = 60  # days for rolling
-        # Real implementation would pull from a DB or file; here we mock using random walk
-        import random
-        random.seed(42)
-
-        def generate_rolling_series(base_value):
-            return simulate_series(base_value, period=series_len, delta=0.001)
-
-        # Generate rolling data (deque-like) for each metric
-        def get_z_scores(metric_name, base_value):
-            series = generate_rolling_series(base_value)
-            z_series = self._calculate_z_score(series)
-            return z_series.iloc[-1]
-
-        z_scores = {
-            'DXY': get_z_scores('DXY', raw_data['DXY']),
-            'VIX': get_z_scores('VIX', raw_data['VIX']),
-            'US10Y_TLT': get_z_scores('US10Y_TLT', raw_data['US10Y']),
-        }
-
-        # ---- 3. Compute regime, score, veto ----
-        regime = self._detect_regime(z_scores)
-        macro_score, contributions = self._calculate_macro_score(z_scores)
-        veto = self._check_veto(z_scores)
-
-        # ---- 4. Build and return result ----
+        # 3. Analyze
+        regime = self._detect_regime(z_scores, macro_stats)
+        macro_score = self._calculate_macro_score(z_scores)
+        
+        # 4. Result
         result = {
+            "timestamp": datetime.now().isoformat(),
             "macro_score": macro_score,
             "regime": regime,
-            "veto": veto,
-            "raw": raw_data,
             "z_scores": z_scores,
-            "contributions_by_metric": contributions
+            "macro_stats": macro_stats,
+            "raw_market_prices": raw_prices
         }
         return result
 
 if __name__ == "__main__":
+    # Test with provided key
     agent = MacroAgent()
-    print("Running Macro Agent...")
-    result = agent.generate()
-    print(result)
+    print("Running Macro Agent with Real Data...")
+    report = agent.generate()
+    import json
+    print(json.dumps(report, indent=4, ensure_ascii=False))
