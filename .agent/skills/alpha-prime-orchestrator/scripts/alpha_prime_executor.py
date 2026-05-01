@@ -31,7 +31,7 @@ class AlphaPrimeExecutor:
         
         # ثانياً: أسواق الدخل الثابت (تكلفة الأموال)
         "US10Y": "^TNX",
-        "US02Y": "ZT=F", # Futures for 2Y sensitivity
+        "US02Y": "^IRX",   # Use 13-week T-Bill as proxy for short-term if 2Y is unavailable, or ^ZT=F
         "HY_SPREAD": "HYG", # High Yield Corporate Bond ETF
         
         # ثالثاً: العملات (السيولة والتوترات)
@@ -85,18 +85,19 @@ class AlphaPrimeExecutor:
         ratios = {}
 
         try:
-            # 1. منحنى العائد (Yield Curve) — الفارق الفعلي بين 10Y و 2Y
+            # 1. منحنى العائد (Yield Curve) — الفارق الفعلي
             if "US10Y" in ctx and "US02Y" in ctx:
                 us10y = ctx["US10Y"]["close"]
                 us02y = ctx["US02Y"]["close"]
+                # تحويل عوائد yfinance (تكون عادة بـ 10x) إذا لزم الأمر، لكن ^TNX و ^IRX في نفس النطاق تقريباً
                 spread = round(us10y - us02y, 4)
                 ratios["yield_curve_spread"] = spread
                 if spread < 0:
-                    ratios["yield_curve_status"] = "Inverted (ركود قادم)"
+                    ratios["yield_curve_status"] = f"Inverted ({spread:.2f}) - ركود قادم"
                 elif spread < 0.5:
-                    ratios["yield_curve_status"] = "Flat (ضغط على البنوك)"
+                    ratios["yield_curve_status"] = f"Flat ({spread:.2f}) - ضغط سيولة"
                 else:
-                    ratios["yield_curve_status"] = "Normal (نمو صحي)"
+                    ratios["yield_curve_status"] = f"Normal ({spread:.2f}) - نمو"
             
             # 2. النحاس إلى الذهب (Copper / Gold) - نمو vs خوف
             if "COPPER" in ctx and "GOLD" in ctx:
