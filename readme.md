@@ -66,7 +66,24 @@ IF TIPS > 2.0% → قلل الذهب + النمو
 
 ---
 
+## ⚡ التشغيل السريع (Quick Start)
+```powershell
+# 1. اضبط مفتاح Gemini (مجاني من https://aistudio.google.com/apikey)
+$env:GEMINI_API_KEY="your-key-here"
+
+# 2. شغّل التقرير التحليلي الشامل
+cd c:\Users\Islam\Desktop\Trad\.agent\skills\alpha-prime-orchestrator\scripts
+python alpha_prime_agent.py --asset XAU=F --report full
+
+# 3. أو تقرير التنفيذ لأصل محدد
+python alpha_prime_agent.py --asset BTC-USD --report execution
+```
+📖 [دليل التشغيل الكامل](docs/QUICKSTART.md)
+
+---
+
 ## 📂 الوثائق التفصيلية
+*   [🚀 دليل التشغيل السريع](docs/QUICKSTART.md) — كيف تشغّل الوكيل خطوة بخطوة
 *   [🔬 الإطار الديناميكي للارتباطات](docs/DYNAMIC_CORRELATION_FRAMEWORK.md) — المرجع الأساسي الشامل
 *   [🏆 الإنجازات والأهداف](docs/ACHIEVEMENTS_AND_GOALS.md)
 *   [🛠️ القدرات التقنية](docs/TECHNICAL_CAPABILITIES.md)

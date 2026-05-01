@@ -5,6 +5,7 @@ import sys
 import yfinance as yf
 import pandas as pd
 from amt_engine import AMTEngine
+from regime_detector import RegimeDetector
 
 # Import Macro Agent and Correlation Agent
 from alpha_prime_macro import MacroAgent
@@ -84,10 +85,18 @@ class AlphaPrimeExecutor:
         ratios = {}
 
         try:
-            # 1. منحنى العائد (Yield Curve Proxy)
-            # بما أن US02Y قد يكون عقوداً، نستخدم الفارق التقريبي أو النسبة
+            # 1. منحنى العائد (Yield Curve) — الفارق الفعلي بين 10Y و 2Y
             if "US10Y" in ctx and "US02Y" in ctx:
-                ratios["yield_curve_status"] = "Inverted" if ctx["US10Y"]["close"] < 4.0 else "Normal (Approx)" # مثال تبسيط
+                us10y = ctx["US10Y"]["close"]
+                us02y = ctx["US02Y"]["close"]
+                spread = round(us10y - us02y, 4)
+                ratios["yield_curve_spread"] = spread
+                if spread < 0:
+                    ratios["yield_curve_status"] = "Inverted (ركود قادم)"
+                elif spread < 0.5:
+                    ratios["yield_curve_status"] = "Flat (ضغط على البنوك)"
+                else:
+                    ratios["yield_curve_status"] = "Normal (نمو صحي)"
             
             # 2. النحاس إلى الذهب (Copper / Gold) - نمو vs خوف
             if "COPPER" in ctx and "GOLD" in ctx:
@@ -133,6 +142,17 @@ class AlphaPrimeExecutor:
         
         # حساب النسب الاستخباراتية بعد توفر بيانات الأصول
         self.calculate_intelligence_ratios()
+        
+        # تشغيل محرك كشف النظام الاقتصادي
+        print("Running Regime Detection Engine...")
+        regime_result = RegimeDetector.detect(
+            self.payload["intelligence_ratios"],
+            self.payload["correlation_context"]
+        )
+        self.payload["market_regime"] = regime_result
+        print(f"  → النظام: {regime_result['regime_name']} (ثقة: {regime_result['confidence']}%)")
+        if regime_result['halt_algorithms']:
+            print("  🔴 تحذير: يُنصح بإيقاف الخوارزميات!")
         
         # 2. جلب بيانات الأصل المستهدف وحساب مستوياته الزمنية
         target_df = self.fetch_ohlcv_data(self.target_asset)

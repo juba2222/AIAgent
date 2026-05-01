@@ -18,6 +18,7 @@ class AMTEngine:
 
         # 1. تحديد نطاق السعر (Price Bins)
         # نستخدم أسعار الإغلاق كمبسّط للبروفايل السعري
+        df = df.copy()
         min_p = df['Close'].min()
         max_p = df['Close'].max()
         
@@ -30,7 +31,7 @@ class AMTEngine:
 
         # تقسيم النطاق إلى 50 مستوى (Bin)
         bins = np.linspace(min_p, max_p, 50)
-        df['bin'] = pd.cut(df['Close'], bins=bins)
+        df.loc[:, 'bin'] = pd.cut(df['Close'], bins=bins)
         
         # 2. حساب حجم التداول لكل مستوى
         volume_profile = df.groupby('bin', observed=True)['Volume'].sum()
