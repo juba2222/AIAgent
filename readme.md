@@ -1,6 +1,6 @@
 # 🤖 Alpha Prime: Senior Macro Algo-Strategist
 
-وكيل ذكاء اصطناعي يعالج 7 طبقات من البيانات لإنتاج تقارير استخباراتية وقرارات تداول قائمة على **الإطار الديناميكي للارتباطات بين الأصول**، نظرية المزاد (AMT)، والتحليل البيني (Intermarket Analysis).
+وكيل ذكاء اصطناعي يعالج **12 طبقة** من البيانات الاستخباراتية (من الماكرو إلى التنبؤات العصبية) لإنتاج تقارير تداول قائمة على **الإطار الديناميكي للارتباطات**، نظرية المزاد (AMT)، وتتبع السيولة الذكية.
 
 ---
 
@@ -36,7 +36,8 @@
 ## 📈 النسب الاستخباراتية (Intelligence Ratios)
 *   **ماكرو:** US10Y/US02Y، Copper/Gold، Global Liquidity/SPX
 *   **هيكل السوق:** HYG/TLT، XLY/XLP، NDX/RUT
-*   **تقييم:** ERP، CAPE، TIPS (الفائدة الحقيقية)
+*   **أموال ذكية:** Congress Trading (Quiver API)، Insider Activity
+*   **تنبؤات:** Neural Price Targets (Layer 10)، Signal Evolution (Layer 12)
 *   **كريبتو:** BTC/XAU، MVRV، NVT
 
 ---
@@ -67,16 +68,12 @@ IF TIPS > 2.0% → قلل الذهب + النمو
 ---
 
 ## ⚡ التشغيل السريع (Quick Start)
-```powershell
-# 1. اضبط مفتاح Gemini (مجاني من https://aistudio.google.com/apikey)
+# 1. اضبط مفتاح Gemini 
 $env:GEMINI_API_KEY="your-key-here"
 
-# 2. شغّل التقرير التحليلي الشامل
-cd c:\Users\Islam\Desktop\Trad\.agent\skills\alpha-prime-orchestrator\scripts
-python alpha_prime_agent.py --asset XAU=F --report full
-
-# 3. أو تقرير التنفيذ لأصل محدد
-python alpha_prime_agent.py --asset BTC-USD --report execution
+# 2. شغّل التقرير الاستخباراتي الشامل (12 طبقة)
+cd .agent\skills\alpha_prime_orchestrator\scripts
+python alpha_prime_agent.py --asset NVDA --report both
 ```
 📖 [دليل التشغيل الكامل](docs/QUICKSTART.md)
 
@@ -84,6 +81,7 @@ python alpha_prime_agent.py --asset BTC-USD --report execution
 
 ## 📂 الوثائق التفصيلية
 *   [🚀 دليل التشغيل السريع](docs/QUICKSTART.md) — كيف تشغّل الوكيل خطوة بخطوة
+*   [🩺 تشخيص حالة المشروع](docs/PROJECT_DIAGNOSIS.md) — التقرير الفني للجاهزية
 *   [🔬 الإطار الديناميكي للارتباطات](docs/DYNAMIC_CORRELATION_FRAMEWORK.md) — المرجع الأساسي الشامل
 *   [🏆 الإنجازات والأهداف](docs/ACHIEVEMENTS_AND_GOALS.md)
 *   [🛠️ القدرات التقنية](docs/TECHNICAL_CAPABILITIES.md)

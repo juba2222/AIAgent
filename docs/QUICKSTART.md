@@ -26,6 +26,14 @@ $env:GEMINI_API_KEY="your-key-here"
 $env:FRED_API_KEY="your-key-here"
 ```
 
+#### مفتاح Quiver Quantitative (اختياري - لمراقبة الأموال الذكية)
+1. اذهب إلى: https://www.quiverquant.com/api/
+2. احصل على مفتاح مجاني (Free Tier)
+3. اضبطه:
+```powershell
+$env:QUIVER_API_KEY="your-key-here"
+```
+
 > **لجعل المفاتيح دائمة** (لا تضيع عند إغلاق الطرفية):
 > ```powershell
 > [System.Environment]::SetEnvironmentVariable("GEMINI_API_KEY", "your-key", "User")
@@ -38,7 +46,7 @@ $env:FRED_API_KEY="your-key-here"
 
 ### التقرير التحليلي الشامل (6 أقسام)
 ```powershell
-cd c:\Users\Islam\Desktop\Trad\.agent\skills\alpha-prime-orchestrator\scripts
+cd c:\Users\Islam\Desktop\Trad\.agent\skills\alpha_prime_orchestrator\scripts
 python alpha_prime_agent.py --asset XAU=F --report full
 ```
 
@@ -74,8 +82,9 @@ python alpha_prime_agent.py --asset XAU=F --report full --provider openai
 ---
 
 ## مسار الملفات الناتجة
-- **البيانات الخام:** `scripts/alpha_prime_context.json`
-- **التقارير:** `reports/report_XAUF_20260501_1900.md`
+- **البيانات الخام:** `scripts/alpha_prime_context.json` (يتم تحديثه عند كل تشغيل)
+- **التقارير:** مجلد `reports/` يحتوي على تقارير بصيغة Markdown.
+- **الأخبار:** يتم حفظ الأخبار في قاعدة بيانات محلية في مجلد مهارة `alphaear_news`.
 
 ---
 

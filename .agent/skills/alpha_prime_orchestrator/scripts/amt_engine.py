@@ -17,24 +17,41 @@ class AMTEngine:
             return None
 
         # 1. تحديد نطاق السعر (Price Bins)
-        # نستخدم أسعار الإغلاق كمبسّط للبروفايل السعري
         df = df.copy()
-        min_p = df['Close'].min()
-        max_p = df['Close'].max()
         
-        if min_p == max_p:
+        # Ensure 'Close' is a 1D series
+        if 'Close' in df.columns:
+            close_series = df['Close']
+            if isinstance(close_series, pd.DataFrame):
+                close_series = close_series.iloc[:, 0]
+        else:
+            return None
+
+        min_p = close_series.min()
+        max_p = close_series.max()
+        
+        # Handle cases where min_p or max_p might be a Series (rare but possible with certain df structures)
+        if hasattr(min_p, 'item'): min_p = min_p.item()
+        if hasattr(max_p, 'item'): max_p = max_p.item()
+        
+        if float(min_p) == float(max_p):
             return {
-                "POC": round(min_p, 4),
-                "VAH": round(min_p, 4),
-                "VAL": round(min_p, 4)
+                "POC": round(float(min_p), 4),
+                "VAH": round(float(min_p), 4),
+                "VAL": round(float(min_p), 4)
             }
 
         # تقسيم النطاق إلى 50 مستوى (Bin)
         bins = np.linspace(min_p, max_p, 50)
-        df.loc[:, 'bin'] = pd.cut(df['Close'], bins=bins)
+        df.loc[:, 'bin'] = pd.cut(close_series, bins=bins)
         
         # 2. حساب حجم التداول لكل مستوى
-        volume_profile = df.groupby('bin', observed=True)['Volume'].sum()
+        # Ensure 'Volume' is also 1D
+        volume_series = df['Volume']
+        if isinstance(volume_series, pd.DataFrame):
+            volume_series = volume_series.iloc[:, 0]
+            
+        volume_profile = df.groupby('bin', observed=True).apply(lambda x: volume_series.loc[x.index].sum())
         
         if volume_profile.empty or volume_profile.sum() == 0:
             return None

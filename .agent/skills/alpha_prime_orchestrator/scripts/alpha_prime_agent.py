@@ -53,25 +53,28 @@ ANALYTICAL_REPORT_INSTRUCTIONS = """
 بناءً على منحنى العائد، نسبة النحاس/الذهب، ونسبة الكماليات/الأساسيات. حدد: نمو، ركود، تضخم، أم ركود تضخمي. اشرح كمياً.
 
 ## 2. خريطة تدفقات السيولة والارتباطات (Liquidity & Correlation Map)
-أين تتجه الأموال الذكية؟ Risk-On vs Risk-Off. استخدم نسب HYG/TLT و NDX/RUT.
+أين تتجه الأموال الذكية؟ Risk-On vs Risk-Off. استخدم نسب HYG/TLT و NDX/RUT. أضف رؤى من مهارة Smart Money (Layer 4).
 
-## 3. تقييم المخاطر الهيكلية (Structural Risk & Valuation)
-هل الأسواق في فقاعة؟ استخدم VIX وعلاقته بمستويات الأصول.
+## 3. الرؤى الاستراتيجية العميقة (Deep Strategic Insights - Layer 9)
+تحليل "سلسلة الانتقال" (Transmission Chain) بناءً على مهارة DeepEar Lite والبحث المتعمق.
 
-## 4. التحليل العميق للذهب (XAU/USD Deep-Dive)
-عوائد حقيقية + DXY + AMT + BTC/XAU.
+## 4. السياق الويب اللحظي وتطور الإشارات (Web Context & Signal Evolution)
+دمج نتائج البحث الحي (Layer 11) وتتبع زخم الإشارات (Layer 12). هل المحفزات في تصاعد أم خفوت؟
 
 ## 5. حالة الأصول الرقمية (Crypto Market Structure)
 وضع البيتكوين كمؤشر لشهية المخاطرة.
 
-## 6. الخلاصة الخوارزمية (Algorithmic Actionable Output)
+## 6. مخطط المنطق البصري (Visual Logic Flow - Mermaid)
+أنشئ مخطط Mermaid يشرح تسلسل الأسباب والنتائج (Logic Visualization).
+
+## 7. الخلاصة الخوارزمية (Algorithmic Actionable Output)
 3 فلاتر برمجية بصيغة If/Then لتجنب التداول في فترات الانفصال الهيكلي.
 """
 
 EXECUTION_REPORT_INSTRUCTIONS = """
 أصدر "تقرير استراتيجية التنفيذ" (Execution Strategy Report) للأصل المستهدف بالهيكلية التالية:
 
-## 1. انعكاس السياق على الأصل وتطور الفترات (Macro Context & Timeframe Evolution)
+## 1. انعكاس السياق على الأصل (Macro Context)
 ربط البيئة الكلية بسلوك الأصل. هل هو Risk-On أم Risk-Off الآن؟
 
 ## 2. تحليل هيكل المزاد متعدد الفترات (Multi-Timeframe AMT Analysis)
@@ -81,13 +84,19 @@ EXECUTION_REPORT_INSTRUCTIONS = """
 - اليومية: PD vs CD
 حدد: توازن (Balance) أم اكتشاف (Discovery)؟ أين الفراغات السعرية (Liquidity Voids)؟
 
-## 3. أفضل إعدادات الصفقات الخوارزمية (Optimal Algo-Trade Setups)
+## 3. التنبؤ العصبي والأهداف السعرية (Neural Forecast & Price Targets - Layer 10)
+توقعات الحركة السعرية القادمة بناءً على مهارة Predictor ونماذج السلاسل الزمنية. اذكر مستويات Target 1 و Target 2.
+
+## 4. أفضل إعدادات الصفقات الخوارزمية (Optimal Algo-Trade Setups)
 إعدادين بصيغة If/Then:
 - إعداد الارتداد (Mean Reversion)
 - إعداد الاختراق (Breakout)
 مع فلاتر إبطال (VIX, Liquidity).
 
-## 4. درجة اليقين وإدارة المخاطر (Conviction Score & Risk Metrics)
+## 5. مخطط المنطق البصري (Visual Logic Flow - Mermaid)
+مخطط Mermaid يوضح تسلسل اتخاذ القرار لهذا الأصل تحديداً.
+
+## 6. درجة اليقين وإدارة المخاطر (Conviction Score & Risk Metrics)
 تقييم 1-10 + R:R + نقطة الاستسلام (Invalidation Level).
 """
 
@@ -98,7 +107,7 @@ def call_gemini(system_prompt: str, user_prompt: str, api_key: str) -> str:
     genai.configure(api_key=api_key)
     
     model = genai.GenerativeModel(
-        model_name="gemini-2.5-flash",
+        model_name="gemini-1.5-flash", 
         system_instruction=system_prompt
     )
     
@@ -129,7 +138,7 @@ def call_openai(system_prompt: str, user_prompt: str, api_key: str) -> str:
     return response.choices[0].message.content
 
 
-def generate_report(asset: str, report_type: str, provider: str) -> str:
+def generate_report(asset: str, report_type: str, provider: str, proxy: str = None) -> str:
     """
     المسار الكامل: جلب البيانات → كشف النظام → توليد التقرير.
     """
@@ -137,9 +146,10 @@ def generate_report(asset: str, report_type: str, provider: str) -> str:
     print("=" * 60)
     print(f"🚀 Alpha Prime Agent — تحليل {asset}")
     print(f"   النوع: {report_type} | المزود: {provider}")
+    if proxy: print(f"   Proxy: {proxy}")
     print("=" * 60)
     
-    executor = AlphaPrimeExecutor(asset)
+    executor = AlphaPrimeExecutor(asset, proxy=proxy)
     context_json = executor.generate_context_json()
     
     # === 2. تحضير البرومبت ===
@@ -167,7 +177,7 @@ def generate_report(asset: str, report_type: str, provider: str) -> str:
     # === 3. استدعاء النموذج ===
     api_key = None
     if provider == "gemini":
-        api_key = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
+        api_key = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY") or "AIzaSyDp7sYunAMgQez_4tGzfP9oVANlhis9QRE"
         if not api_key:
             print("\n❌ خطأ: لم يتم العثور على GEMINI_API_KEY")
             print("   اضبطه بالأمر: $env:GEMINI_API_KEY='your-key-here'")
@@ -233,8 +243,11 @@ def main():
                         choices=["gemini", "openai"],
                         help="مزود النموذج اللغوي: gemini / openai")
     
+    parser.add_argument("--proxy", type=str, default=None,
+                        help="HTTP/HTTPS Proxy (e.g., http://user:pass@host:port)")
+    
     args = parser.parse_args()
-    generate_report(args.asset, args.report, args.provider)
+    generate_report(args.asset, args.report, args.provider, proxy=args.proxy)
 
 
 if __name__ == "__main__":

@@ -166,7 +166,11 @@ class MacroAgent:
         if 'HYG' in hist_data and 'TLT' in hist_data:
             ratio = hist_data['HYG'] / hist_data['TLT']
             z_scores['HYG_TLT'] = self._calculate_z_score(ratio)
-            raw_prices['CreditSpreadProxy'] = float(ratio.iloc[-1])
+            # Ensure scalar conversion
+            val = ratio.iloc[-1]
+            if isinstance(val, (pd.Series, pd.DataFrame)):
+                val = val.iloc[0]
+            raw_prices['CreditSpreadProxy'] = float(val)
 
         # 2. Fetch FRED data
         print("MacroAgent: Fetching FRED macro indicators...")

@@ -41,20 +41,28 @@ class CorrelationAgent:
     # ---------------------------------------------------------------------
     # Helper: fetch minute‑level OHLCV from yfinance
     # ---------------------------------------------------------------------
-    def _fetch_yf_series(self, ticker, period='2d', interval='1m'):
+    def _fetch_yf_series(self, ticker, period='7d', interval='1h'): # Switched to 1h for more stability across weekends
         try:
-            # interval='1m' is restricted to last 7 days; 2d period is safe
             data = yf.download(tickers=ticker, period=period, interval=interval, progress=False)
             if data.empty:
                 return pd.Series(dtype=float)
             
-            # Use 'Close' column. yfinance sometimes returns a MultiIndex if multiple tickers are passed, 
-            # but here we pass one at a time.
-            if isinstance(data.columns, pd.MultiIndex):
-                return data['Close'][ticker]
-            return data['Close']
+            # Extract 'Close' - handle potential MultiIndex or single column
+            if 'Close' in data.columns:
+                series = data['Close']
+            elif ('Close', ticker) in data.columns:
+                series = data[('Close', ticker)]
+            else:
+                # Last resort: first column that looks like price
+                series = data.iloc[:, 0]
+                
+            # If it's a DataFrame (multiple tickers accidentally), take the first column
+            if isinstance(series, pd.DataFrame):
+                series = series.iloc[:, 0]
+                
+            return series
         except Exception as e:
-            print(f"Error fetching {ticker} from Yahoo Finance: {e}")
+            print(f"Error fetching {ticker}: {e}")
             return pd.Series(dtype=float)
 
     # ---------------------------------------------------------------------
