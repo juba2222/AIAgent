@@ -12,3 +12,5 @@ openai>=1.0.0
 loguru>=0.7.0
 transformers>=4.30.0
 torch>=2.0.0
+financetoolkit>=1.8.0
+financedatabase>=2.2.0

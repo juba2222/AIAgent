@@ -25,9 +25,20 @@ Use `scripts/stock_tools.py` via `StockTools`.
     -   Returns dict with sector, industry, market cap, PE ratio, and summary.
     -   Supports A-Share/HK/US stocks.
 
+### 2. Advanced Analytics (FinanceToolkit)
+
+Use `scripts/analytics_tools.py` via `AnalyticsTools`.
+
+-   **Full Analysis**: `get_full_analysis(ticker)`
+    -   150+ Ratios: Profitability, Valuation, Solvency.
+    -   Models: Extended DuPont, Enterprise Value.
+    -   Risk: Value at Risk (VaR), Sharpe Ratio.
+-   **Economics**: `get_global_economics()`
+    -   Macro indicators: CPI, GDP, Unemployment for 60+ countries.
+
 ## Dependencies
 
--   `pandas`, `requests`, `akshare`, `yfinance`
+-   `pandas`, `requests`, `akshare`, `yfinance`, `financetoolkit`
 -   `scripts/database_manager.py` (stock tables)
 
 ## Notes

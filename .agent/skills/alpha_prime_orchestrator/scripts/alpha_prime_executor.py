@@ -79,35 +79,51 @@ class AlphaPrimeExecutor:
             "market_sentiment": {"score": 0, "label": "neutral", "catalysts": []}
         }
         # Initialize Skills
+        self.news_db = None
+        self.sent_db = None
         try:
-            if NewsDB and NewsNowTools:
-                self.news_db = NewsDB()
-                self.news_tools = NewsNowTools(self.news_db)
-            else:
-                self.news_tools = None
+            self.news_tools = NewsNowTools(self.news_db) if NewsDB and NewsNowTools else None
+            self.sentiment_tools = SentimentTools(self.sent_db) if SentimentDB and SentimentTools else None
+            
+            # Individual Skill Initialization
+            try:
+                from alphaear_search.scripts.search_tools import SearchTools
+                self.search_tools = SearchTools()
+            except Exception as e:
+                print(f"Warning: search_tools initialization failed: {e}")
+                self.search_tools = None
+
+            try:
+                from alphaear_stock.scripts.stock_tools import StockTools
+                self.stock_tools = StockTools(self.db) if hasattr(self, 'db') else StockTools(None) # Handle DB if needed
+            except Exception as e:
+                print(f"Warning: stock_tools initialization failed: {e}")
+                self.stock_tools = None
+
+            try:
+                from alphaear_predictor.scripts.predictor_tools import PredictorTools
+                self.predictor_tools = PredictorTools()
+            except Exception as e:
+                print(f"Warning: predictor_tools initialization failed: {e}")
+                self.predictor_tools = None
+
+            try:
+                from alphaear_stock.scripts.analytics_tools import AnalyticsTools
+                self.analytics_tools = AnalyticsTools()
+            except Exception as e:
+                print(f"Warning: analytics_tools initialization failed: {e}")
+                self.analytics_tools = None
+
+            try:
+                from openbb_agent import OpenBBAgent
+                self.openbb_agent = OpenBBAgent()
+            except Exception as e:
+                print(f"Warning: openbb_agent initialization failed: {e}")
+                self.openbb_agent = None
                 
-            if SentimentDB and SentimentTools:
-                self.sent_db = SentimentDB()
-                self.sentiment_tools = SentimentTools(self.sent_db)
-            else:
-                self.sentiment_tools = None
-            
-            # New Skill Integration
-            from alphaear_search.scripts.search_tools import SearchTools
-            from alphaear_stock.scripts.stock_tools import StockTools
-            from alphaear_predictor.scripts.predictor_tools import PredictorTools
-            
-            self.search_tools = SearchTools()
-            self.stock_tools = StockTools()
-            self.predictor_tools = PredictorTools()
-            
         except Exception as e:
-            print(f"Warning: Skill initialization failed: {e}")
-            self.news_tools = None
-            self.sentiment_tools = None
-            self.search_tools = None
-            self.stock_tools = None
-            self.predictor_tools = None
+            print(f"Warning: Core skill initialization failed: {e}")
+            self.analytics_tools = None
             
         # Quiver API Key
         self.quiver_key = os.getenv("QUIVER_API_KEY")
@@ -141,9 +157,7 @@ class AlphaPrimeExecutor:
                 ticker, 
                 period=period, 
                 interval=interval, 
-                progress=False, 
-                session=self.session,
-                proxy=self.proxy
+                progress=False
             )
             if data.empty:
                 return None
@@ -349,6 +363,25 @@ class AlphaPrimeExecutor:
             "historical_context": "Integrated with Signal Tracker skill"
         }
 
+    def fetch_layer_13_institutional(self):
+        print(f"Fetching Layer 13: Institutional & Dark Pool Intel (OpenBB)...")
+        if self.openbb_agent:
+            self.payload["layer_13_institutional"] = self.openbb_agent.generate(self.target_asset)
+        else:
+            self.payload["layer_13_institutional"] = "OpenBB Agent not initialized"
+
+    def fetch_layer_14_toolkit_analytics(self):
+        print(f"Fetching Layer 14: Advanced Analytics (FinanceToolkit) for {self.target_asset}...")
+        if self.analytics_tools:
+            # Clean ticker for US stocks
+            clean_ticker = self.target_asset.split('-')[0].split('=')[0].split('.')[0]
+            try:
+                self.payload["layer_14_toolkit_analytics"] = self.analytics_tools.get_full_analysis(clean_ticker)
+            except Exception as e:
+                self.payload["layer_14_toolkit_analytics"] = f"Error: {e}"
+        else:
+            self.payload["layer_14_toolkit_analytics"] = "Analytics Tools not initialized"
+
     def generate_context_json(self) -> str:
         # Step-by-step layer ingestion
         self.fetch_layer_1_technical() # Includes Regime Detection
@@ -364,8 +397,10 @@ class AlphaPrimeExecutor:
         self.fetch_layer_10_predictions()
         self.fetch_layer_11_web_context()
         self.fetch_layer_12_signal_evolution()
+        self.fetch_layer_13_institutional()
+        self.fetch_layer_14_toolkit_analytics()
         
-        self.payload["layer_6_alt_data"] = "Integrated via Smart Money/Logistics"
+        self.payload["layer_6_alt_data"] = "Integrated via Smart Money/Logistics/OpenBB/FinanceToolkit"
 
         return json.dumps(self.payload, indent=4, ensure_ascii=False)
 

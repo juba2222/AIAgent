@@ -61,13 +61,19 @@ ANALYTICAL_REPORT_INSTRUCTIONS = """
 ## 4. السياق الويب اللحظي وتطور الإشارات (Web Context & Signal Evolution)
 دمج نتائج البحث الحي (Layer 11) وتتبع زخم الإشارات (Layer 12). هل المحفزات في تصاعد أم خفوت؟
 
-## 5. حالة الأصول الرقمية (Crypto Market Structure)
+## 5. ذكاء المؤسسات والسيولة المظلمة (Institutional & Dark Pool Intel - Layer 13)
+رصد تحركات الـ Dark Pools والنشاط المؤسساتي بناءً على OpenBB. هل هناك "تراكم" (Accumulation) صامت؟
+
+## 6. حالة الأصول الرقمية (Crypto Market Structure)
 وضع البيتكوين كمؤشر لشهية المخاطرة.
 
-## 6. مخطط المنطق البصري (Visual Logic Flow - Mermaid)
+## 7. مخطط المنطق البصري (Visual Logic Flow - Mermaid)
 أنشئ مخطط Mermaid يشرح تسلسل الأسباب والنتائج (Logic Visualization).
 
-## 7. الخلاصة الخوارزمية (Algorithmic Actionable Output)
+## 8. التحليل المالي المعمق (Advanced Financial Analytics - Layer 14)
+نتائج الـ FinanceToolkit (الربحية، التقييم، نماذج Dupont، وتحليل القيمة المؤسساتية). حدد نقاط القوة والضعف في الميزانية العمومية.
+
+## 9. الخلاصة الخوارزمية (Algorithmic Actionable Output)
 3 فلاتر برمجية بصيغة If/Then لتجنب التداول في فترات الانفصال الهيكلي.
 """
 

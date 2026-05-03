@@ -9,6 +9,7 @@ import requests as _requests
 from requests.exceptions import RequestException
 from loguru import logger
 from .database_manager import DatabaseManager
+from .analytics_tools import AnalyticsTools
 import os
 from contextlib import contextmanager
 
@@ -136,6 +137,7 @@ class StockTools:
             auto_update: 是否在列表为空时自动更新，默认 True
         """
         self.db = db
+        self.analytics = AnalyticsTools()
         if auto_update:
             self._check_and_update_stock_list()
 

@@ -18,3 +18,9 @@ alpha_prime_context.json
 # OS
 Thumbs.db
 .DS_Store
+
+# Projects
+data/
+scratch/
+*.zip*
+*.fdmdownload
