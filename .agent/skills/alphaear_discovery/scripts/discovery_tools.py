@@ -80,6 +80,39 @@ class DiscoveryTools:
             logger.error(f"Error searching ETFs: {e}")
             return []
 
+    def get_competitors(self, ticker):
+        """
+        Find companies in the same industry as the given ticker.
+        """
+        try:
+            # Find the target company first to get its industry
+            target = self.equities.select(index=ticker)
+            if target.empty:
+                return []
+            
+            industry = target.iloc[0].get('industry')
+            country = target.iloc[0].get('country')
+            
+            if not industry:
+                return []
+            
+            # Find others in the same industry
+            competitors = self.equities.select(industry=industry, country=country)
+            
+            formatted = []
+            for t, row in competitors.iterrows():
+                if t == ticker: continue # Skip itself
+                formatted.append({
+                    "ticker": t,
+                    "name": row.get('name', 'N/A'),
+                    "sector": row.get('sector', 'N/A'),
+                    "industry": row.get('industry', 'N/A')
+                })
+            return formatted[:10] # Top 10
+        except Exception as e:
+            logger.error(f"Error getting competitors for {ticker}: {e}")
+            return []
+
 if __name__ == "__main__":
     # Simple CLI test
     discovery = DiscoveryTools()

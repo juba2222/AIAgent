@@ -21,7 +21,7 @@
 
 ### 4. إدارة المخاطر المبنية على القيمة
 - تحديد نقاط "الاستسلام" (Invalidation) بناءً على رفض مناطق القيمة (Value Area Rejection).
-- حساب درجة اليقين (Conviction Score) بناءً على عدد الطبقات المتوافقة (Confluence).
+- حساب درجة اليقين (Conviction Score) بناءً على عدد الطبقات المتوافقة الـ 14 (Confluence).
 
 ## 🧠 محرك كشف النظام (Regime Detection Engine)
 - **التصنيف الآلي:** تصنيف السوق إلى (Goldilocks, Stagflation, Recession, Reflation).

@@ -16,6 +16,17 @@ from datetime import datetime
 
 from alpha_prime_executor import AlphaPrimeExecutor
 
+# إضافة مسارات المهارات للاستيراد
+sys.path.append(os.path.join(os.path.dirname(__file__), "..", "..", "alphaear_discovery", "scripts"))
+sys.path.append(os.path.join(os.path.dirname(__file__), "..", "..", "alphaear_deepear_lite", "scripts"))
+
+try:
+    from discovery_tools import DiscoveryTools
+    from deepear_lite import DeepEarLiteTools
+except ImportError:
+    DiscoveryTools = None
+    DeepEarLiteTools = None
+
 # ─────────────────────────────────────────────
 # System Prompt — الدستور المعماري للوكيل
 # ─────────────────────────────────────────────
@@ -148,6 +159,36 @@ def generate_report(asset: str, report_type: str, provider: str, proxy: str = No
     """
     المسار الكامل: جلب البيانات → كشف النظام → توليد التقرير.
     """
+    # === 0. Discovery Logic (Optional) ===
+    if asset == "DISCOVERY":
+        print("\n🔍 البدء في وضع الاستكشاف الذكي (Discovery Mode)...")
+        if not DeepEarLiteTools or not DiscoveryTools:
+            print("❌ خطأ: مهارات الاستكشاف أو DeepEar غير متوفرة.")
+            return None
+        
+        det = DeepEarLiteTools()
+        signals = det.fetch_latest_signals()
+        
+        # استخراج أول إشارة قوية
+        if not signals:
+            print("⚠️ لم يتم العثور على إشارات حديثة من DeepEar. استخدام أصل افتراضي.")
+            asset = "BTC-USD"
+        else:
+            first_signal = signals[0]
+            theme = first_signal.get("title", "")
+            print(f"📌 المحفز المكتشف: {theme}")
+            
+            dt = DiscoveryTools()
+            # محاولة البحث عن أصول مرتبطة بالثيم
+            discovery_results = dt.search_equities(query=theme) or dt.search_etfs(query=theme)
+            
+            if discovery_results:
+                asset = discovery_results[0]['ticker']
+                print(f"🎯 تم اختيار الأصل: {asset} ({discovery_results[0]['name']})")
+            else:
+                print("⚠️ لم يتم العثور على أصول مرتبطة مباشرة. استخدام BTC-USD كمؤشر سيولة.")
+                asset = "BTC-USD"
+
     # === 1. جلب البيانات ===
     print("=" * 60)
     print(f"🚀 Alpha Prime Agent — تحليل {asset}")
@@ -251,9 +292,16 @@ def main():
     
     parser.add_argument("--proxy", type=str, default=None,
                         help="HTTP/HTTPS Proxy (e.g., http://user:pass@host:port)")
+    parser.add_argument("--discovery", action="store_true",
+                        help="تفعيل وضع الاستكشاف الآلي بناءً على إشارات DeepEar")
     
     args = parser.parse_args()
-    generate_report(args.asset, args.report, args.provider, proxy=args.proxy)
+    
+    target_asset = args.asset
+    if args.discovery:
+        target_asset = "DISCOVERY"
+        
+    generate_report(target_asset, args.report, args.provider, proxy=args.proxy)
 
 
 if __name__ == "__main__":
