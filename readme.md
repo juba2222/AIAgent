@@ -60,12 +60,32 @@ $env:GEMINI_API_KEY="your-key-here"
 pip install -r requirements.txt
 ```
 
-### 2. تشغيل الوكيل (14 طبقة)
-شغّل الدورة الاستخباراتية الكاملة لأي أصل مالي:
+### 2. تشغيل التحليل التساعي للذهب (Dimension 9 Analysis)
+تم تحديث الوكيل ليدعم **النموذج التساعي الشامل** المخصص للذهب والأسواق الكبرى:
 ```powershell
-# مثال لتحليل سهم NVDA
-/alpha_prime_agent --asset NVDA --report both
+# تحليل الذهب (XAU=F) باستخدام الأبعاد التسعة
+python .agent/skills/alpha_prime_orchestrator/scripts/alpha_prime_agent.py --asset XAU=F --report full
 ```
+
+### 3. تحليل أي أصل مالي آخر
+```powershell
+# مثال لتحليل سهم NVDA أو البيتكوين
+python .agent/skills/alpha_prime_orchestrator/scripts/alpha_prime_agent.py --asset NVDA --report both
+```
+
+---
+
+## 💎 النموذج التساعي لأسواق الذهب (The Nonary Gold Model)
+يدمج النظام الآن 9 أبعاد استراتيجية حصرياً:
+1.  **السياق الكلي:** تحليل صدمات السيولة وسلاسل المنطق.
+2.  **هيكل المزاد:** تشخيص "نوع اللعبة" (متوازن vs اتجاهي).
+3.  **هيكل السيولة:** تحليل بروفايل الحجم والوقت (AMT/TPO).
+4.  **تدفق الأوامر:** كشف الامتصاص (Absorption) والفقاعات السعرية.
+5.  **المقاييس الكمية:** نماذج التقلب GARCH/EWMA وحساب VaR.
+6.  **التحليل التقاطعي:** نسب الذهب/الفضة والعوائد الحقيقية.
+7.  **تحليل شركات التعدين:** تقييم Newmont/Barrick ونماذج DuPont.
+8.  **التوليف الاستراتيجي:** بناء سيناريوهات If/Then احتمالية.
+9.  **الأموال الذكية والجيوسياسة:** تتبع اللوبيات وميزانيات التسليح.
 
 ---
 

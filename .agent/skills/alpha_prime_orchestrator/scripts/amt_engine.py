@@ -8,18 +8,16 @@ class AMTEngine:
     """
 
     @staticmethod
-    def calculate_value_area(df, value_area_pct=0.70):
+    def calculate_value_area(df, value_area_pct=0.70, use_tpo=False):
         """
         حساب POC, VAH, VAL.
-        df يجب أن يحتوي على أعمدة: ['Close', 'Volume']
+        إذا كان use_tpo=True، يتم استخدام الوقت المقضي عند السعر بدلاً من الحجم.
         """
         if df is None or df.empty:
             return None
 
-        # 1. تحديد نطاق السعر (Price Bins)
         df = df.copy()
         
-        # Ensure 'Close' is a 1D series
         if 'Close' in df.columns:
             close_series = df['Close']
             if isinstance(close_series, pd.DataFrame):
@@ -30,7 +28,6 @@ class AMTEngine:
         min_p = close_series.min()
         max_p = close_series.max()
         
-        # Handle cases where min_p or max_p might be a Series (rare but possible with certain df structures)
         if hasattr(min_p, 'item'): min_p = min_p.item()
         if hasattr(max_p, 'item'): max_p = max_p.item()
         
@@ -38,45 +35,54 @@ class AMTEngine:
             return {
                 "POC": round(float(min_p), 4),
                 "VAH": round(float(min_p), 4),
-                "VAL": round(float(min_p), 4)
+                "VAL": round(float(min_p), 4),
+                "type": "TPO" if use_tpo else "Volume"
             }
 
-        # تقسيم النطاق إلى 50 مستوى (Bin)
         bins = np.linspace(min_p, max_p, 50)
         df.loc[:, 'bin'] = pd.cut(close_series, bins=bins)
         
-        # 2. حساب حجم التداول لكل مستوى
-        # Ensure 'Volume' is also 1D
-        volume_series = df['Volume']
-        if isinstance(volume_series, pd.DataFrame):
-            volume_series = volume_series.iloc[:, 0]
-            
-        volume_profile = df.groupby('bin', observed=True).apply(lambda x: volume_series.loc[x.index].sum())
+        # Ensure use_tpo is a boolean
+        if isinstance(use_tpo, (pd.Series, pd.DataFrame)):
+            use_tpo = use_tpo.any()
+
+        # Ensure we have a scalar for volume sum
+        vol_sum = df['Volume'].sum() if 'Volume' in df.columns else 0
+        if isinstance(vol_sum, (pd.Series, pd.DataFrame)):
+            vol_sum = vol_sum.sum() # Sum it up if it's a series
+
+        if use_tpo or 'Volume' not in df.columns or float(vol_sum) == 0:
+            # TPO Logic: Count occurrences of price in bins
+            profile = df.groupby('bin', observed=True).size()
+            profile_type = "TPO"
+        else:
+            # Volume Logic
+            volume_series = df['Volume']
+            if isinstance(volume_series, pd.DataFrame):
+                volume_series = volume_series.iloc[:, 0]
+            profile = df.groupby('bin', observed=True).apply(lambda x: volume_series.loc[x.index].sum())
+            profile_type = "Volume"
         
-        if volume_profile.empty or volume_profile.sum() == 0:
+        if profile.empty or profile.sum() == 0:
             return None
 
-        # 3. تحديد POC (نقطة التحكم - السعر صاحب أعلى حجم)
-        poc_bin = volume_profile.idxmax()
+        poc_bin = profile.idxmax()
         poc = (poc_bin.left + poc_bin.right) / 2
         
-        # 4. حساب Value Area (VAH & VAL)
-        total_volume = volume_profile.sum()
-        target_va_volume = total_volume * value_area_pct
+        total_metric = profile.sum()
+        target_va_metric = total_metric * value_area_pct
         
-        # ترتيب المستويات حسب المسافة من الـ POC
-        sorted_bins = volume_profile.sort_values(ascending=False)
+        sorted_bins = profile.sort_values(ascending=False)
         
-        cumulative_vol = 0
+        cumulative_m = 0
         va_bins = []
         
-        for idx, vol in sorted_bins.items():
-            cumulative_vol += vol
+        for idx, val in sorted_bins.items():
+            cumulative_m += val
             va_bins.append(idx)
-            if cumulative_vol >= target_va_volume:
+            if cumulative_m >= target_va_metric:
                 break
         
-        # استخراج VAH و VAL من المستويات المختارة
         va_prices = []
         for b in va_bins:
             va_prices.append(b.left)
@@ -88,8 +94,50 @@ class AMTEngine:
         return {
             "POC": round(float(poc), 4),
             "VAH": round(float(vah), 4),
-            "VAL": round(float(val), 4)
+            "VAL": round(float(val), 4),
+            "type": profile_type
         }
+
+    @staticmethod
+    def diagnose_order_flow_patterns(df):
+        """
+        تشخيص أنماط تدفق الأوامر (محاكاة):
+        - Absorption: السعر يتحرك بصعوبة عند مستويات القيمة رغم زيادة التقلب.
+        - Aggressive Bubbles: تمدد سعري سريع بعيداً عن القيمة.
+        """
+        if len(df) < 5:
+            return []
+
+        df = df.tail(20).copy()
+
+        # Ensure we work with 1D series
+        close = df['Close'].iloc[:, 0] if isinstance(df['Close'], pd.DataFrame) else df['Close']
+        high = df['High'].iloc[:, 0] if isinstance(df['High'], pd.DataFrame) else df['High']
+        low = df['Low'].iloc[:, 0] if isinstance(df['Low'], pd.DataFrame) else df['Low']
+        volume = df['Volume'].iloc[:, 0] if isinstance(df['Volume'], pd.DataFrame) else df['Volume']
+
+        # حساب التذبذب (ATR-like)
+        ranges = (high - low).abs()
+        avg_range = ranges.mean()
+        last_range = ranges.iloc[-1]
+
+        patterns = []
+
+        # 1. Aggressive Bubble detection (Price snap-back risk)
+        if last_range > avg_range * 2.5:
+            patterns.append("AGGRESSIVE_BUBBLE_DETECTED")
+
+        # 2. Absorption detection (Price stalling at value area)
+        # We check if volume is high but range is small (simulated)
+        if 'Volume' in df.columns and volume.sum() > 0:
+            vol_efficiency = ranges / volume.replace(0, np.nan)
+            avg_efficiency = vol_efficiency.iloc[:-1].mean()
+            last_efficiency = vol_efficiency.iloc[-1]
+
+            if last_efficiency < avg_efficiency * 0.4:
+                patterns.append("ABSORPTION_LIKELY")
+
+        return patterns
 
     @staticmethod
     def get_timeframe_levels(df):

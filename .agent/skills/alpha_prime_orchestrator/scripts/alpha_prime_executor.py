@@ -8,6 +8,8 @@ import time
 import random
 from amt_engine import AMTEngine
 from regime_detector import RegimeDetector
+from quant_engine import QuantEngine
+from mining_analysis import MiningSectorAnalysis
 
 # Import Macro Agent and Correlation Agent
 from alpha_prime_macro import MacroAgent
@@ -206,12 +208,13 @@ class AlphaPrimeExecutor:
             print(f"Error calculating ratios: {e}")
 
     def fetch_layer_1_technical(self):
-        print("Fetching Layer 1: Technical & Correlation Data (Multi-Timeframe)...")
+        print("Fetching Layer 1: Technical & AMT/TPO Data...")
         asset_summary = {}
+        market_df = self.fetch_ohlcv_data("^GSPC")
+
         for name, ticker in self.CROSS_ASSETS.items():
             df = self.fetch_ohlcv_data(ticker)
             if df is not None:
-                # Ensure we handle pandas scalar/series properly
                 close_val = df['Close'].iloc[-1]
                 if isinstance(close_val, (pd.Series, pd.DataFrame)): close_val = close_val.iloc[0]
                 
@@ -226,18 +229,27 @@ class AlphaPrimeExecutor:
         print("Running Regime Detection Engine...")
         regime_result = RegimeDetector.detect(self.payload["intelligence_ratios"], self.payload["correlation_context"])
         self.payload["market_regime"] = regime_result
-        print(f"  → النظام: {regime_result['regime_name']} (ثقة: {regime_result['confidence']}%)")
         
         target_df = self.fetch_ohlcv_data(self.target_asset)
         if target_df is not None:
             close_val = target_df['Close'].iloc[-1]
             if isinstance(close_val, (pd.Series, pd.DataFrame)): close_val = close_val.iloc[0]
             
-            self.payload["layer_1_technical"]["target_asset_data"] = {
-                "close": round(float(close_val), 4)
-            }
-            temporal_levels = AMTEngine.get_timeframe_levels(target_df)
-            self.payload["layer_1_technical"]["AMT_Temporal_Levels"] = temporal_levels
+            # Dimension 2 & 3: AMT/TPO
+            use_tpo = 'Volume' not in target_df.columns or target_df['Volume'].sum() == 0
+            amt_data = AMTEngine.calculate_value_area(target_df, use_tpo=use_tpo)
+            order_flow = AMTEngine.diagnose_order_flow_patterns(target_df)
+
+            # Dimension 5: Quant Metrics
+            quant_metrics = QuantEngine.get_risk_metrics(target_df, market_df)
+
+            self.payload["layer_1_technical"].update({
+                "close": round(float(close_val), 4),
+                "amt_structure": amt_data,
+                "order_flow_diagnostics": order_flow,
+                "quant_metrics": quant_metrics,
+                "temporal_levels": AMTEngine.get_timeframe_levels(target_df)
+            })
         else:
              self.payload["layer_1_technical"]["target_asset_data"] = "Failed to fetch"
 
@@ -304,17 +316,35 @@ class AlphaPrimeExecutor:
         else:
             self.payload["layer_5_liquidity"] = "Sentiment tools or news not available"
 
-    def fetch_layer_7_logistics(self):
-        print("Fetching Layer 7: Logistics (BDRY/BDI Proxy)...")
-        if "BDRY" in self.payload["correlation_context"]:
-            bdry_data = self.payload["correlation_context"]["BDRY"]
-            self.payload["layer_7_logistics"] = {
-                "bdi_proxy_ticker": "BDRY",
-                "current_price": bdry_data["close"],
-                "status": "Healthy" if bdry_data["close"] > 10 else "Low Activity"
-            }
-        else:
-            self.payload["layer_7_logistics"] = "BDI Proxy data missing"
+    def fetch_layer_7_mining_and_fundamental(self):
+        print("Fetching Dimension 7: Mining & Fundamental Analysis...")
+        mining_data = MiningSectorAnalysis.analyze_sector()
+
+        # Check arbitrage if target is Gold
+        arbitrage = "N/A"
+        if "GOLD" in self.target_asset.upper() or "XAU" in self.target_asset.upper():
+            # Simple check
+            gold_df = self.fetch_ohlcv_data(self.target_asset, period="1mo")
+            miners_df = self.fetch_ohlcv_data("GDX", period="1mo")
+            if gold_df is not None and miners_df is not None:
+                def get_val(series_or_val):
+                    if hasattr(series_or_val, 'iloc'):
+                        return series_or_val.iloc[0]
+                    return series_or_val
+
+                g_close_last = get_val(gold_df['Close'].iloc[-1])
+                g_close_first = get_val(gold_df['Close'].iloc[0])
+                m_close_last = get_val(miners_df['Close'].iloc[-1])
+                m_close_first = get_val(miners_df['Close'].iloc[0])
+
+                g_chg = ((g_close_last / g_close_first) - 1) * 100
+                m_chg = ((m_close_last / m_close_first) - 1) * 100
+                arbitrage = MiningSectorAnalysis.check_arbitrage(float(g_chg), float(m_chg))
+
+        self.payload["layer_7_mining"] = {
+            "giants": mining_data,
+            "arbitrage_status": arbitrage
+        }
 
     def fetch_layer_8_catalysts(self):
         print("Fetching Layer 8: Catalysts (AlphaEar News)...")
@@ -384,12 +414,12 @@ class AlphaPrimeExecutor:
 
     def generate_context_json(self) -> str:
         # Step-by-step layer ingestion
-        self.fetch_layer_1_technical() # Includes Regime Detection
+        self.fetch_layer_1_technical() # Includes Regime Detection, Quant, AMT
         self.fetch_layer_2_macro()
         self.fetch_layer_3_correlation()
         self.fetch_layer_4_smart_money()
         self.fetch_layer_5_liquidity_sentiment()
-        self.fetch_layer_7_logistics()
+        self.fetch_layer_7_mining_and_fundamental()
         self.fetch_layer_8_catalysts()
         
         # New Integrated Layers
