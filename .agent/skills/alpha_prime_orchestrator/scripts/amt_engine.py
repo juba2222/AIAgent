@@ -92,12 +92,15 @@ class AMTEngine:
         val = min(va_prices)
         
         # Identify HVNs (top 3 peaks other than POC)
-        # Identify LVNs (bottom 3 troughs within price range)
         hvn_list = sorted_bins.iloc[1:4]
         hvn_prices = [round(float((idx.left + idx.right) / 2), 4) for idx in hvn_list.index]
 
+        # Identify LVNs (areas with low activity within the range)
         lvn_list = profile.sort_values(ascending=True).iloc[:3]
         lvn_prices = [round(float((idx.left + idx.right) / 2), 4) for idx in lvn_list.index]
+
+        # Identify Single Prints (Empty bins with 0 volume/time within the distribution)
+        single_prints = [round(float((idx.left + idx.right) / 2), 4) for idx in profile[profile == 0].index]
 
         return {
             "POC": round(float(poc), 4),
@@ -105,8 +108,32 @@ class AMTEngine:
             "VAL": round(float(val), 4),
             "HVNs": hvn_prices,
             "LVNs": lvn_prices,
+            "single_prints": single_prints[:5], # Top 5 voids
+            "profile_shape": AMTEngine._detect_profile_shape(profile, poc_bin),
             "type": profile_type
         }
+
+    @staticmethod
+    def _detect_profile_shape(profile, poc_bin):
+        """
+        تحديد شكل البروفايل (P, b, D).
+        P-shape: POC in upper half (Short covering)
+        b-shape: POC in lower half (Long liquidation)
+        D-shape: POC in middle (Balanced)
+        """
+        try:
+            bins = list(profile.index)
+            poc_idx = bins.index(poc_bin)
+            total_bins = len(bins)
+
+            if poc_idx > total_bins * 0.6:
+                return "P-Shape (Bullish/Short Covering)"
+            elif poc_idx < total_bins * 0.4:
+                return "b-Shape (Bearish/Long Liquidation)"
+            else:
+                return "D-Shape (Balanced)"
+        except:
+            return "Indeterminate"
 
     @staticmethod
     def diagnose_order_flow_patterns(df):

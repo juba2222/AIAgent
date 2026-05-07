@@ -16,20 +16,30 @@ from options_engine import OptionsGexEngine
 from alpha_prime_macro import MacroAgent
 from correlation_agent import CorrelationAgent
 
-# Path for skills
-SKILLS_PATH = r"c:\Users\Islam\Desktop\Trad\.agent\skills"
+# Path for internal skills
+SKILLS_PATH = os.path.join(os.path.dirname(__file__), "..", "..")
 if SKILLS_PATH not in sys.path:
     sys.path.append(SKILLS_PATH)
 
-# Skill Imports (Absolute imports now that folders use underscores)
+# Path for Awesome-finance-skills
+AWESOME_SKILLS_PATH = os.path.join(os.path.dirname(__file__), "..", "..", "..", "Awesome-finance-skills-main", "skills")
+if os.path.exists(AWESOME_SKILLS_PATH):
+    sys.path.append(AWESOME_SKILLS_PATH)
+
+# Skill Imports
 try:
     from alphaear_news.scripts.news_tools import NewsNowTools
     from alphaear_news.scripts.database_manager import DatabaseManager as NewsDB
-    from alphaear_sentiment.scripts.sentiment_tools import SentimentTools
-    from alphaear_sentiment.scripts.database_manager import DatabaseManager as SentimentDB
+    # Sentiment & Predictor from Awesome-finance-skills
+    sys.path.append(os.path.join(AWESOME_SKILLS_PATH, "alphaear-sentiment", "scripts"))
+    from sentiment_tools import SentimentTools
+    from database_manager import DatabaseManager as SentimentDB
+
+    sys.path.append(os.path.join(AWESOME_SKILLS_PATH, "alphaear-predictor", "scripts"))
+    from kronos_predictor import KronosPredictorUtility
 except ImportError as e:
     print(f"Warning: Skill imports failed: {e}")
-    NewsNowTools = NewsDB = SentimentTools = SentimentDB = None
+    NewsNowTools = NewsDB = SentimentTools = SentimentDB = KronosPredictorUtility = None
 
 class AlphaPrimeExecutor:
     """
@@ -84,12 +94,22 @@ class AlphaPrimeExecutor:
             "correlation_context": {},
             "market_sentiment": {"score": 0, "label": "neutral", "catalysts": []}
         }
-        # Initialize Skills
+        # Initialize Skills with safe defaults
         self.news_db = None
         self.sent_db = None
+        self.news_tools = None
+        self.sentiment_tools = None
+        self.search_tools = None
+        self.stock_tools = None
+        self.predictor_tools = None
+        self.analytics_tools = None
+        self.openbb_agent = None
+
         try:
-            self.news_tools = NewsNowTools(self.news_db) if NewsDB and NewsNowTools else None
-            self.sentiment_tools = SentimentTools(self.sent_db) if SentimentDB and SentimentTools else None
+            if NewsDB and NewsNowTools:
+                self.news_tools = NewsNowTools(self.news_db)
+            if SentimentDB and SentimentTools:
+                self.sentiment_tools = SentimentTools(self.sent_db)
             
             # Individual Skill Initialization
             try:
@@ -107,8 +127,10 @@ class AlphaPrimeExecutor:
                 self.stock_tools = None
 
             try:
-                from alphaear_predictor.scripts.predictor_tools import PredictorTools
-                self.predictor_tools = PredictorTools()
+                if KronosPredictorUtility:
+                    self.predictor_tools = KronosPredictorUtility()
+                else:
+                    self.predictor_tools = None
             except Exception as e:
                 print(f"Warning: predictor_tools initialization failed: {e}")
                 self.predictor_tools = None
@@ -399,12 +421,18 @@ class AlphaPrimeExecutor:
                 self.payload["layer_9_deep_insights"] = "N/A"
 
     def fetch_layer_10_predictions(self):
-        print(f"Fetching Layer 10: Market Prediction...")
+        print(f"Fetching Layer 10: Market Prediction (Kronos)...")
         if self.predictor_tools:
             try:
-                self.payload["layer_10_predictions"] = self.predictor_tools.predict_market(self.target_asset)
-            except:
-                self.payload["layer_10_predictions"] = "N/A"
+                target_df = self.fetch_ohlcv_data(self.target_asset)
+                if target_df is not None:
+                    # Kronos expects 'date' column
+                    target_df = target_df.reset_index()
+                    target_df.columns = [c.lower() for c in target_df.columns]
+                    forecast = self.predictor_tools.get_base_forecast(target_df)
+                    self.payload["layer_10_predictions"] = [f.__dict__ for f in forecast]
+            except Exception as e:
+                self.payload["layer_10_predictions"] = f"Prediction failed: {e}"
 
     def fetch_layer_11_web_context(self):
         print(f"Fetching Layer 11: Web Context (Search)...")
@@ -431,17 +459,38 @@ class AlphaPrimeExecutor:
 
     def fetch_layer_14_toolkit_analytics(self):
         print(f"Fetching Layer 14: Advanced Analytics (FinanceToolkit) for {self.target_asset}...")
-        if self.analytics_tools:
-            # Clean ticker for US stocks
+        try:
+            from analytics_engine import AnalyticsEngine
+            ae = AnalyticsEngine()
             clean_ticker = self.target_asset.split('-')[0].split('=')[0].split('.')[0]
-            try:
-                self.payload["layer_14_toolkit_analytics"] = self.analytics_tools.get_full_analysis(clean_ticker)
-            except Exception as e:
-                self.payload["layer_14_toolkit_analytics"] = f"Error: {e}"
-        else:
-            self.payload["layer_14_toolkit_analytics"] = "Analytics Tools not initialized"
+            self.payload["layer_14_toolkit_analytics"] = ae.get_full_analysis(clean_ticker)
+        except Exception as e:
+            self.payload["layer_14_toolkit_analytics"] = f"Toolkit error: {e}"
+
+    def _json_serial(self, obj):
+        """JSON serializer for objects not serializable by default json code"""
+        if isinstance(obj, (datetime, pd.Timestamp)):
+            return obj.isoformat()
+        from datetime import date
+        if isinstance(obj, date):
+            return obj.isoformat()
+        raise TypeError (f"Type {type(obj)} not serializable")
+
+    def _convert_keys_to_string(self, d):
+        """Recursively convert dictionary keys to strings for JSON serialization."""
+        if not isinstance(d, dict):
+            return d
+        return {str(k): self._convert_keys_to_string(v) if isinstance(v, dict) else v for k, v in d.items()}
 
     def generate_context_json(self) -> str:
+        # Asset Metadata (FinanceDatabase)
+        print("Fetching Asset Metadata (FinanceDatabase)...")
+        try:
+            from metadata_engine import MetadataEngine
+            self.payload["asset_metadata"] = MetadataEngine.get_asset_metadata(self.target_asset)
+        except:
+            self.payload["asset_metadata"] = "N/A"
+
         # Step-by-step layer ingestion
         self.fetch_layer_1_technical() # Includes Regime Detection, Quant, AMT
 
@@ -466,7 +515,9 @@ class AlphaPrimeExecutor:
         
         self.payload["layer_6_alt_data"] = "Integrated via Smart Money/Logistics/OpenBB/FinanceToolkit"
 
-        return json.dumps(self.payload, indent=4, ensure_ascii=False)
+        # Pre-process payload to ensure all keys are strings and handle datetime values
+        processed_payload = self._convert_keys_to_string(self.payload)
+        return json.dumps(processed_payload, indent=4, ensure_ascii=False, default=self._json_serial)
 
 if __name__ == "__main__":
     target = sys.argv[1] if len(sys.argv) > 1 else "NVDA"
