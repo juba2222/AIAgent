@@ -91,10 +91,20 @@ class AMTEngine:
         vah = max(va_prices)
         val = min(va_prices)
         
+        # Identify HVNs (top 3 peaks other than POC)
+        # Identify LVNs (bottom 3 troughs within price range)
+        hvn_list = sorted_bins.iloc[1:4]
+        hvn_prices = [round(float((idx.left + idx.right) / 2), 4) for idx in hvn_list.index]
+
+        lvn_list = profile.sort_values(ascending=True).iloc[:3]
+        lvn_prices = [round(float((idx.left + idx.right) / 2), 4) for idx in lvn_list.index]
+
         return {
             "POC": round(float(poc), 4),
             "VAH": round(float(vah), 4),
             "VAL": round(float(val), 4),
+            "HVNs": hvn_prices,
+            "LVNs": lvn_prices,
             "type": profile_type
         }
 
