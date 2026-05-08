@@ -79,7 +79,7 @@ class AlphaPrimeExecutor:
         
         # تقلب (Fear)
         "VIX": "^VIX",
-        "MOVE": "TLT", # Proxy if ^MOVE not available, or keep TLT for ratios
+        "MOVE": "IEF", # Proxy using 7-10Y Treasury (Different from TLT 20Y+)
         
         # رقمية (Alt Liquidity)
         "BTC": "BTC-USD",

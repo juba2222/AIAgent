@@ -95,8 +95,8 @@ class AMTEngine:
         vah = max(va_prices)
         val = min(va_prices)
         
-        # Identify HVNs (top 3 peaks other than POC)
-        hvn_list = sorted_bins.iloc[1:4]
+        # Identify HVNs (top 3 peaks including POC as the first)
+        hvn_list = sorted_bins.iloc[:3]
         hvn_prices = [round(float((idx.left + idx.right) / 2), 4) for idx in hvn_list.index]
 
         # Identify LVNs (areas with low activity within the range)
