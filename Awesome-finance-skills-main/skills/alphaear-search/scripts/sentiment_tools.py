@@ -4,7 +4,7 @@ import json
 from loguru import logger
 from agno.agent import Agent
 from .llm.factory import get_model
-from .database_manager import DatabaseManager
+from database_manager import DatabaseManager
 
 # 从环境变量读取默认情绪分析模式
 DEFAULT_SENTIMENT_MODE = os.getenv("SENTIMENT_MODE", "auto")  # auto, bert, llm

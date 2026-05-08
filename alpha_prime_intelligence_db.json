@@ -1,113 +1,119 @@
 {
-    "timestamp": "2026-05-07T00:30:03.228933",
-    "target_asset": "XAU=F",
+    "timestamp": "2026-05-08T11:28:37.393612",
+    "target_asset": "GC=F",
     "layer_1_technical": {
-        "close": 925.0,
+        "close": 4731.8999,
         "amt_structure": {
-            "POC": 951.5315,
-            "VAH": 954.155,
-            "VAL": 926.171,
+            "POC": 4497.3945,
+            "VAH": 4750.561,
+            "VAL": 4488.018,
             "HVNs": [
-                939.2885,
-                948.0335,
-                935.7905
+                4741.1845,
+                4534.901,
+                5228.7645
             ],
             "LVNs": [
-                956.7785,
-                944.5355,
-                920.0505
+                4516.1475,
+                4722.4315,
+                5285.0235
             ],
             "single_prints": [],
-            "profile_shape": "P-Shape (Bullish/Short Covering)",
+            "profile_shape": "b-Shape (Bearish/Long Liquidation)",
             "type": "Volume"
         },
-        "order_flow_diagnostics": [],
+        "order_flow_diagnostics": [
+            "ABSORPTION_LIKELY"
+        ],
         "quant_metrics": {
-            "daily_volatility": 0.16498261124687805,
-            "ewma_volatility": 0.182323283097727,
-            "var_95": 0.01534116649216321,
-            "var_99": 0.021915611491516163,
-            "beta": -0.10058821437666955
+            "daily_volatility": 0.3060796595953037,
+            "ewma_volatility": 0.2615818161033013,
+            "var_95": 0.03564103331683049,
+            "var_99": 0.047603781557996785,
+            "beta": 0.7732924618931426
         },
         "temporal_levels": {
             "current_day": {
-                "POC": 925.0,
-                "VAH": 925.0,
-                "VAL": 925.0,
+                "POC": 4731.8999,
+                "VAH": 4731.8999,
+                "VAL": 4731.8999,
                 "type": "Volume"
             },
             "previous_day": {
-                "POC": 939.3,
-                "VAH": 939.3,
-                "VAL": 939.3,
+                "POC": 4699.7998,
+                "VAH": 4699.7998,
+                "VAL": 4699.7998,
                 "type": "Volume"
             },
             "current_week": {
-                "POC": 939.153,
-                "VAH": 939.6,
-                "VAL": 939.004,
+                "POC": 4729.7325,
+                "VAH": 4731.9,
+                "VAL": 4727.565,
                 "HVNs": [
-                    939.451
+                    4556.345,
+                    4682.051,
+                    4699.3895
                 ],
                 "LVNs": [
-                    939.153,
-                    939.451
+                    4682.051,
+                    4699.3895,
+                    4556.345
+                ],
+                "single_prints": [],
+                "profile_shape": "P-Shape (Bullish/Short Covering)",
+                "type": "Volume"
+            },
+            "previous_week": {
+                "POC": 4591.7005,
+                "VAH": 4593.029,
+                "VAL": 4590.372,
+                "HVNs": [
+                    4674.0715,
+                    4628.9,
+                    4615.6145
+                ],
+                "LVNs": [
+                    4615.6145,
+                    4628.9,
+                    4674.0715
                 ],
                 "single_prints": [],
                 "profile_shape": "b-Shape (Bearish/Long Liquidation)",
                 "type": "Volume"
             },
-            "previous_week": {
-                "POC": 942.509,
-                "VAH": 949.7,
-                "VAL": 942.261,
-                "HVNs": [
-                    949.452,
-                    935.566,
-                    937.054
-                ],
-                "LVNs": [
-                    937.054,
-                    935.566,
-                    949.452
-                ],
-                "single_prints": [],
-                "profile_shape": "D-Shape (Balanced)",
-                "type": "Volume"
-            },
             "current_month": {
-                "POC": 942.4205,
-                "VAH": 942.6,
-                "VAL": 939.008,
+                "POC": 4729.7325,
+                "VAH": 4731.9,
+                "VAL": 4727.565,
                 "HVNs": [
-                    939.1875,
-                    939.547
+                    4556.345,
+                    4682.051,
+                    4699.3895
                 ],
                 "LVNs": [
-                    939.1875,
-                    939.547,
-                    942.4205
+                    4630.0345,
+                    4682.051,
+                    4699.3895
                 ],
                 "single_prints": [],
                 "profile_shape": "P-Shape (Bullish/Short Covering)",
                 "type": "Volume"
             },
             "previous_month": {
-                "POC": 935.5215,
-                "VAH": 957.7,
-                "VAL": 910.386,
+                "POC": 4593.0165,
+                "VAH": 4857.6,
+                "VAL": 4589.829,
                 "HVNs": [
-                    940.45,
-                    957.207,
-                    937.493
+                    4784.282,
+                    4854.4125,
+                    4790.6575
                 ],
                 "LVNs": [
-                    942.4215,
-                    925.664,
-                    927.636
+                    4650.396,
+                    4739.653,
+                    4720.5265
                 ],
                 "single_prints": [
-                    942.4215
+                    4650.396
                 ],
                 "profile_shape": "b-Shape (Bearish/Long Liquidation)",
                 "type": "Volume"
@@ -115,46 +121,48 @@
         }
     },
     "intelligence_ratios": {
-        "yield_curve_spread": -77.944,
-        "yield_curve_status": "Inverted (-77.94) - ركود قادم",
-        "copper_gold_ratio": 0.001312,
-        "credit_stress_ratio": 0.9312,
-        "consumer_strength_ratio": 1.423,
-        "liquidity_concentration_ratio": 9.907,
-        "btc_gold_ratio": 17.2551,
-        "real_yield_proxy": 111.15,
+        "yield_curve_spread": -77.838,
+        "yield_curve_status": "Inverted (-77.84) - ركود قادم",
+        "copper_gold_ratio": 0.001328,
+        "credit_stress_ratio": 0.9324,
+        "consumer_strength_ratio": 1.4275,
+        "liquidity_concentration_ratio": 10.059,
+        "btc_gold_ratio": 16.9641,
+        "real_yield_proxy": 111.03,
         "erp_proxy": "4.5% (Estimated)",
         "cape_shiller_proxy": "34.2 (Estimated)"
     },
     "correlation_context": {
         "SPX": {
-            "close": 7365.1201,
+            "close": 7337.1099,
             "AMT_Temporal_Levels": {
                 "current_day": {
+                    "POC": 7337.1099,
+                    "VAH": 7337.1099,
+                    "VAL": 7337.1099,
+                    "type": "Volume"
+                },
+                "previous_day": {
                     "POC": 7365.1201,
                     "VAH": 7365.1201,
                     "VAL": 7365.1201,
                     "type": "Volume"
                 },
-                "previous_day": {
-                    "POC": 7259.2202,
-                    "VAH": 7259.2202,
-                    "VAL": 7259.2202,
-                    "type": "Volume"
-                },
                 "current_week": {
-                    "POC": 7259.4535,
+                    "POC": 7363.443,
                     "VAH": 7365.12,
-                    "VAL": 7257.776,
+                    "VAL": 7334.93,
                     "HVNs": [
-                        7363.443
-                    ],
-                    "LVNs": [
-                        7363.443,
+                        7336.607,
                         7259.4535
                     ],
+                    "LVNs": [
+                        7259.4535,
+                        7336.607,
+                        7363.443
+                    ],
                     "single_prints": [],
-                    "profile_shape": "b-Shape (Bearish/Long Liquidation)",
+                    "profile_shape": "P-Shape (Bullish/Short Covering)",
                     "type": "Volume"
                 },
                 "previous_week": {
@@ -176,20 +184,21 @@
                     "type": "Volume"
                 },
                 "current_month": {
-                    "POC": 7259.4535,
-                    "VAH": 7261.131,
-                    "VAL": 7227.586,
+                    "POC": 7363.443,
+                    "VAH": 7365.12,
+                    "VAL": 7257.776,
                     "HVNs": [
-                        7229.263,
-                        7363.443
+                        7336.607,
+                        7259.4535,
+                        7229.263
                     ],
                     "LVNs": [
-                        7363.443,
                         7229.263,
-                        7259.4535
+                        7259.4535,
+                        7336.607
                     ],
                     "single_prints": [],
-                    "profile_shape": "b-Shape (Bearish/Long Liquidation)",
+                    "profile_shape": "P-Shape (Bullish/Short Covering)",
                     "type": "Volume"
                 },
                 "previous_month": {
@@ -213,30 +222,32 @@
             }
         },
         "NDX": {
-            "close": 28599.1719,
+            "close": 28563.9492,
             "AMT_Temporal_Levels": {
                 "current_day": {
-                    "POC": 28599.1719,
-                    "VAH": 28599.1719,
-                    "VAL": 28599.1719,
+                    "POC": 28563.9492,
+                    "VAH": 28563.9492,
+                    "VAL": 28563.9492,
                     "type": "Volume"
                 },
                 "previous_day": {
-                    "POC": 28015.0605,
-                    "VAH": 28015.0605,
-                    "VAL": 28015.0605,
+                    "POC": 28599.1699,
+                    "VAH": 28599.1699,
+                    "VAL": 28599.1699,
                     "type": "Volume"
                 },
                 "current_week": {
-                    "POC": 28009.494,
-                    "VAH": 28019.161,
-                    "VAL": 27999.827,
+                    "POC": 28570.1695,
+                    "VAH": 28599.17,
+                    "VAL": 27999.826,
                     "HVNs": [
-                        28589.505
+                        28589.503,
+                        28009.493
                     ],
                     "LVNs": [
-                        28589.505,
-                        28009.494
+                        28009.493,
+                        28589.503,
+                        28570.1695
                     ],
                     "single_prints": [],
                     "profile_shape": "b-Shape (Bearish/Long Liquidation)",
@@ -261,20 +272,21 @@
                     "type": "Volume"
                 },
                 "current_month": {
-                    "POC": 28009.494,
-                    "VAH": 28019.161,
-                    "VAL": 27709.821,
+                    "POC": 28570.1695,
+                    "VAH": 28599.17,
+                    "VAL": 27999.826,
                     "HVNs": [
-                        27719.488,
-                        28589.505
+                        28589.503,
+                        28009.493,
+                        27719.488
                     ],
                     "LVNs": [
-                        28589.505,
                         27719.488,
-                        28009.494
+                        28009.493,
+                        28589.503
                     ],
                     "single_prints": [],
-                    "profile_shape": "b-Shape (Bearish/Long Liquidation)",
+                    "profile_shape": "D-Shape (Balanced)",
                     "type": "Volume"
                 },
                 "previous_month": {
@@ -298,35 +310,35 @@
             }
         },
         "RUT": {
-            "close": 2886.7717,
+            "close": 2839.6299,
             "AMT_Temporal_Levels": {
                 "current_day": {
-                    "POC": 2886.7717,
-                    "VAH": 2886.7717,
-                    "VAL": 2886.7717,
+                    "POC": 2839.6299,
+                    "VAH": 2839.6299,
+                    "VAL": 2839.6299,
                     "type": "Volume"
                 },
                 "previous_day": {
-                    "POC": 2845.0,
-                    "VAH": 2845.0,
-                    "VAL": 2845.0,
+                    "POC": 2886.77,
+                    "VAH": 2886.77,
+                    "VAL": 2886.77,
                     "type": "Volume"
                 },
                 "current_week": {
-                    "POC": 2845.091,
-                    "VAH": 2846.017,
-                    "VAL": 2844.165,
+                    "POC": 2885.844,
+                    "VAH": 2886.77,
+                    "VAL": 2838.606,
                     "HVNs": [
-                        2885.8455
+                        2839.5325,
+                        2845.09
                     ],
                     "LVNs": [
-                        2885.8455,
-                        2845.091
+                        2845.09,
+                        2839.5325,
+                        2885.844
                     ],
-                    "single_prints": [
-                        2885.8455
-                    ],
-                    "profile_shape": "b-Shape (Bearish/Long Liquidation)",
+                    "single_prints": [],
+                    "profile_shape": "P-Shape (Bullish/Short Covering)",
                     "type": "Volume"
                 },
                 "previous_week": {
@@ -348,22 +360,21 @@
                     "type": "Volume"
                 },
                 "current_month": {
-                    "POC": 2845.091,
-                    "VAH": 2846.017,
-                    "VAL": 2812.672,
+                    "POC": 2885.844,
+                    "VAH": 2886.77,
+                    "VAL": 2838.606,
                     "HVNs": [
-                        2813.5985,
-                        2885.8455
+                        2839.5325,
+                        2845.09,
+                        2813.598
                     ],
                     "LVNs": [
-                        2885.8455,
-                        2813.5985,
-                        2845.091
+                        2813.598,
+                        2845.09,
+                        2839.5325
                     ],
-                    "single_prints": [
-                        2885.8455
-                    ],
-                    "profile_shape": "b-Shape (Bearish/Long Liquidation)",
+                    "single_prints": [],
+                    "profile_shape": "P-Shape (Bullish/Short Covering)",
                     "type": "Volume"
                 },
                 "previous_month": {
@@ -387,33 +398,35 @@
             }
         },
         "MSCI_EM": {
-            "close": 67.49,
+            "close": 66.59,
             "AMT_Temporal_Levels": {
                 "current_day": {
+                    "POC": 66.59,
+                    "VAH": 66.59,
+                    "VAL": 66.59,
+                    "type": "Volume"
+                },
+                "previous_day": {
                     "POC": 67.49,
                     "VAH": 67.49,
                     "VAL": 67.49,
                     "type": "Volume"
                 },
-                "previous_day": {
-                    "POC": 65.4,
-                    "VAH": 65.4,
-                    "VAL": 65.4,
-                    "type": "Volume"
-                },
                 "current_week": {
                     "POC": 67.4555,
                     "VAH": 67.49,
-                    "VAL": 65.345,
+                    "VAL": 66.521,
                     "HVNs": [
+                        66.556,
                         65.3795
                     ],
                     "LVNs": [
                         65.3795,
+                        66.556,
                         67.4555
                     ],
                     "single_prints": [],
-                    "profile_shape": "D-Shape (Balanced)",
+                    "profile_shape": "P-Shape (Bullish/Short Covering)",
                     "type": "Volume"
                 },
                 "previous_week": {
@@ -439,13 +452,14 @@
                     "VAH": 67.49,
                     "VAL": 64.1,
                     "HVNs": [
+                        66.556,
                         64.1345,
                         65.3795
                     ],
                     "LVNs": [
                         65.3795,
                         64.1345,
-                        67.4555
+                        66.556
                     ],
                     "single_prints": [],
                     "profile_shape": "P-Shape (Bullish/Short Covering)",
@@ -472,28 +486,30 @@
             }
         },
         "US10Y": {
-            "close": 4.356,
+            "close": 4.392,
             "AMT_Temporal_Levels": {
                 "current_day": {
+                    "POC": 4.392,
+                    "VAH": 4.392,
+                    "VAL": 4.392,
+                    "type": "Volume"
+                },
+                "previous_day": {
                     "POC": 4.356,
                     "VAH": 4.356,
                     "VAL": 4.356,
                     "type": "Volume"
                 },
-                "previous_day": {
-                    "POC": 4.416,
-                    "VAH": 4.416,
-                    "VAL": 4.416,
-                    "type": "Volume"
-                },
                 "current_week": {
-                    "POC": 4.416,
+                    "POC": 4.392,
                     "VAH": 4.446,
-                    "VAL": 4.415,
+                    "VAL": 4.391,
                     "HVNs": [
+                        4.416,
                         4.445
                     ],
                     "LVNs": [
+                        4.392,
                         4.416,
                         4.445
                     ],
@@ -521,16 +537,17 @@
                 },
                 "current_month": {
                     "POC": 4.377,
-                    "VAH": 4.446,
+                    "VAH": 4.417,
                     "VAL": 4.376,
                     "HVNs": [
+                        4.392,
                         4.416,
                         4.445
                     ],
                     "LVNs": [
                         4.377,
-                        4.416,
-                        4.445
+                        4.392,
+                        4.416
                     ],
                     "single_prints": [],
                     "profile_shape": "b-Shape (Bearish/Long Liquidation)",
@@ -557,18 +574,18 @@
             }
         },
         "US02Y": {
-            "close": 82.3,
+            "close": 82.23,
             "AMT_Temporal_Levels": {
                 "current_day": {
-                    "POC": 82.3,
-                    "VAH": 82.3,
-                    "VAL": 82.3,
+                    "POC": 82.23,
+                    "VAH": 82.23,
+                    "VAL": 82.23,
                     "type": "Volume"
                 },
                 "previous_day": {
-                    "POC": 82.19,
-                    "VAH": 82.19,
-                    "VAL": 82.19,
+                    "POC": 82.3,
+                    "VAH": 82.3,
+                    "VAL": 82.3,
                     "type": "Volume"
                 },
                 "current_week": {
@@ -576,9 +593,11 @@
                     "VAH": 82.3,
                     "VAL": 82.19,
                     "HVNs": [
-                        82.2985
+                        82.2985,
+                        82.2315
                     ],
                     "LVNs": [
+                        82.2315,
                         82.2985,
                         82.1915
                     ],
@@ -606,16 +625,17 @@
                 },
                 "current_month": {
                     "POC": 82.1915,
-                    "VAH": 82.251,
+                    "VAH": 82.3,
                     "VAL": 82.19,
                     "HVNs": [
                         82.2495,
-                        82.2985
+                        82.2985,
+                        82.2315
                     ],
                     "LVNs": [
+                        82.2315,
                         82.2985,
-                        82.2495,
-                        82.1915
+                        82.2495
                     ],
                     "single_prints": [],
                     "profile_shape": "b-Shape (Bearish/Long Liquidation)",
@@ -642,30 +662,33 @@
             }
         },
         "TIPS": {
-            "close": 111.15,
+            "close": 111.03,
             "AMT_Temporal_Levels": {
                 "current_day": {
+                    "POC": 111.03,
+                    "VAH": 111.03,
+                    "VAL": 111.03,
+                    "type": "Volume"
+                },
+                "previous_day": {
                     "POC": 111.15,
                     "VAH": 111.15,
                     "VAL": 111.15,
                     "type": "Volume"
                 },
-                "previous_day": {
-                    "POC": 111.07,
-                    "VAH": 111.07,
-                    "VAL": 111.07,
-                    "type": "Volume"
-                },
                 "current_week": {
                     "POC": 111.149,
                     "VAH": 111.15,
-                    "VAL": 111.148,
-                    "HVNs": [],
+                    "VAL": 111.069,
+                    "HVNs": [
+                        111.0705
+                    ],
                     "LVNs": [
+                        111.0705,
                         111.149
                     ],
                     "single_prints": [],
-                    "profile_shape": "b-Shape (Bearish/Long Liquidation)",
+                    "profile_shape": "D-Shape (Balanced)",
                     "type": "Volume"
                 },
                 "previous_week": {
@@ -687,15 +710,17 @@
                     "type": "Volume"
                 },
                 "current_month": {
-                    "POC": 111.153,
+                    "POC": 111.151,
                     "VAH": 111.35,
-                    "VAL": 111.15,
+                    "VAL": 111.148,
                     "HVNs": [
-                        111.347
+                        111.3465,
+                        111.0725
                     ],
                     "LVNs": [
-                        111.347,
-                        111.153
+                        111.0725,
+                        111.3465,
+                        111.151
                     ],
                     "single_prints": [],
                     "profile_shape": "b-Shape (Bearish/Long Liquidation)",
@@ -722,33 +747,35 @@
             }
         },
         "HY_SPREAD": {
-            "close": 80.16,
+            "close": 79.86,
             "AMT_Temporal_Levels": {
                 "current_day": {
+                    "POC": 79.86,
+                    "VAH": 79.86,
+                    "VAL": 79.86,
+                    "type": "Volume"
+                },
+                "previous_day": {
                     "POC": 80.16,
                     "VAH": 80.16,
                     "VAL": 80.16,
                     "type": "Volume"
                 },
-                "previous_day": {
-                    "POC": 79.92,
-                    "VAH": 79.92,
-                    "VAL": 79.92,
-                    "type": "Volume"
-                },
                 "current_week": {
-                    "POC": 80.1565,
+                    "POC": 79.8625,
                     "VAH": 80.16,
-                    "VAL": 79.918,
+                    "VAL": 79.859,
                     "HVNs": [
+                        80.1565,
                         79.9215
                     ],
                     "LVNs": [
                         79.9215,
-                        80.1565
+                        80.1565,
+                        79.8625
                     ],
                     "single_prints": [],
-                    "profile_shape": "D-Shape (Balanced)",
+                    "profile_shape": "b-Shape (Bearish/Long Liquidation)",
                     "type": "Volume"
                 },
                 "previous_week": {
@@ -770,10 +797,11 @@
                     "type": "Volume"
                 },
                 "current_month": {
-                    "POC": 80.0605,
+                    "POC": 79.8625,
                     "VAH": 80.16,
-                    "VAL": 80.057,
+                    "VAL": 79.859,
                     "HVNs": [
+                        80.0605,
                         80.1565,
                         79.9215
                     ],
@@ -807,33 +835,35 @@
             }
         },
         "DXY": {
-            "close": 98.014,
+            "close": 97.97,
             "AMT_Temporal_Levels": {
                 "current_day": {
-                    "POC": 98.014,
-                    "VAH": 98.014,
-                    "VAL": 98.014,
+                    "POC": 97.97,
+                    "VAH": 97.97,
+                    "VAL": 97.97,
                     "type": "Volume"
                 },
                 "previous_day": {
-                    "POC": 98.48,
-                    "VAH": 98.48,
-                    "VAL": 98.48,
+                    "POC": 98.25,
+                    "VAH": 98.25,
+                    "VAL": 98.25,
                     "type": "Volume"
                 },
                 "current_week": {
-                    "POC": 98.4655,
+                    "POC": 98.475,
                     "VAH": 98.48,
-                    "VAL": 98.461,
+                    "VAL": 98.012,
                     "HVNs": [
-                        98.475
+                        98.017,
+                        98.246
                     ],
                     "LVNs": [
-                        98.4655,
+                        98.017,
+                        98.246,
                         98.475
                     ],
                     "single_prints": [],
-                    "profile_shape": "b-Shape (Bearish/Long Liquidation)",
+                    "profile_shape": "P-Shape (Bullish/Short Covering)",
                     "type": "TPO"
                 },
                 "previous_week": {
@@ -855,20 +885,21 @@
                     "type": "TPO"
                 },
                 "current_month": {
-                    "POC": 98.209,
+                    "POC": 98.475,
                     "VAH": 98.48,
-                    "VAL": 98.204,
+                    "VAL": 98.012,
                     "HVNs": [
-                        98.4655,
-                        98.475
+                        98.017,
+                        98.2145,
+                        98.246
                     ],
                     "LVNs": [
-                        98.209,
-                        98.4655,
-                        98.475
+                        98.017,
+                        98.2145,
+                        98.246
                     ],
                     "single_prints": [],
-                    "profile_shape": "b-Shape (Bearish/Long Liquidation)",
+                    "profile_shape": "P-Shape (Bullish/Short Covering)",
                     "type": "TPO"
                 },
                 "previous_month": {
@@ -892,32 +923,33 @@
             }
         },
         "EURUSD": {
-            "close": 1.1752,
+            "close": 1.177,
             "AMT_Temporal_Levels": {
                 "current_day": {
-                    "POC": 1.1752,
-                    "VAH": 1.1752,
-                    "VAL": 1.1752,
+                    "POC": 1.177,
+                    "VAH": 1.177,
+                    "VAL": 1.177,
                     "type": "Volume"
                 },
                 "previous_day": {
-                    "POC": 1.1716,
-                    "VAH": 1.1716,
-                    "VAL": 1.1716,
+                    "POC": 1.1747,
+                    "VAH": 1.1747,
+                    "VAL": 1.1747,
                     "type": "Volume"
                 },
                 "current_week": {
-                    "POC": 1.1716,
-                    "VAH": 1.1752,
-                    "VAL": 1.1715,
+                    "POC": 1.1715,
+                    "VAH": 1.1748,
+                    "VAL": 1.1714,
                     "HVNs": [
-                        1.1727,
-                        1.1751
+                        1.1726,
+                        1.1747,
+                        1.177
                     ],
                     "LVNs": [
-                        1.1716,
-                        1.1727,
-                        1.1751
+                        1.1715,
+                        1.1726,
+                        1.1747
                     ],
                     "single_prints": [],
                     "profile_shape": "b-Shape (Bearish/Long Liquidation)",
@@ -942,17 +974,17 @@
                     "type": "TPO"
                 },
                 "current_month": {
-                    "POC": 1.1716,
-                    "VAH": 1.173,
-                    "VAL": 1.1715,
+                    "POC": 1.1715,
+                    "VAH": 1.1748,
+                    "VAL": 1.1714,
                     "HVNs": [
-                        1.1727,
+                        1.1726,
                         1.173,
-                        1.1751
+                        1.1747
                     ],
                     "LVNs": [
-                        1.1716,
-                        1.1727,
+                        1.1715,
+                        1.1726,
                         1.173
                     ],
                     "single_prints": [],
@@ -980,32 +1012,33 @@
             }
         },
         "USDJPY": {
-            "close": 156.43,
+            "close": 156.764,
             "AMT_Temporal_Levels": {
                 "current_day": {
-                    "POC": 156.43,
-                    "VAH": 156.43,
-                    "VAL": 156.43,
+                    "POC": 156.764,
+                    "VAH": 156.764,
+                    "VAL": 156.764,
                     "type": "Volume"
                 },
                 "previous_day": {
-                    "POC": 157.677,
-                    "VAH": 157.677,
-                    "VAL": 157.677,
+                    "POC": 156.508,
+                    "VAH": 156.508,
+                    "VAL": 156.508,
                     "type": "Volume"
                 },
                 "current_week": {
-                    "POC": 156.85,
-                    "VAH": 157.677,
-                    "VAL": 156.837,
+                    "POC": 156.7585,
+                    "VAH": 157.2,
+                    "VAL": 156.747,
                     "HVNs": [
-                        157.206,
-                        157.6645
+                        156.854,
+                        157.188,
+                        157.665
                     ],
                     "LVNs": [
-                        156.85,
-                        157.206,
-                        157.6645
+                        156.7585,
+                        156.854,
+                        157.188
                     ],
                     "single_prints": [],
                     "profile_shape": "b-Shape (Bearish/Long Liquidation)",
@@ -1029,18 +1062,18 @@
                     "type": "TPO"
                 },
                 "current_month": {
-                    "POC": 156.85,
-                    "VAH": 157.219,
-                    "VAL": 156.837,
+                    "POC": 156.7585,
+                    "VAH": 157.2,
+                    "VAL": 156.747,
                     "HVNs": [
-                        156.977,
-                        157.206,
-                        157.6645
+                        156.854,
+                        156.973,
+                        157.188
                     ],
                     "LVNs": [
-                        156.85,
-                        156.977,
-                        157.206
+                        156.7585,
+                        156.854,
+                        156.973
                     ],
                     "single_prints": [],
                     "profile_shape": "b-Shape (Bearish/Long Liquidation)",
@@ -1067,33 +1100,36 @@
             }
         },
         "GOLD": {
-            "close": 4707.3999,
+            "close": 4731.8999,
             "AMT_Temporal_Levels": {
                 "current_day": {
-                    "POC": 4707.3999,
-                    "VAH": 4707.3999,
-                    "VAL": 4707.3999,
+                    "POC": 4731.8999,
+                    "VAH": 4731.8999,
+                    "VAL": 4731.8999,
                     "type": "Volume"
                 },
                 "previous_day": {
-                    "POC": 4555.7998,
-                    "VAH": 4555.7998,
-                    "VAL": 4555.7998,
+                    "POC": 4699.7998,
+                    "VAH": 4699.7998,
+                    "VAL": 4699.7998,
                     "type": "Volume"
                 },
                 "current_week": {
-                    "POC": 4705.4825,
-                    "VAH": 4707.4,
-                    "VAL": 4703.565,
+                    "POC": 4729.7325,
+                    "VAH": 4731.9,
+                    "VAL": 4727.565,
                     "HVNs": [
-                        4555.9295
+                        4556.345,
+                        4682.051,
+                        4699.3895
                     ],
                     "LVNs": [
-                        4555.9295,
-                        4705.4825
+                        4682.051,
+                        4699.3895,
+                        4556.345
                     ],
                     "single_prints": [],
-                    "profile_shape": "D-Shape (Balanced)",
+                    "profile_shape": "P-Shape (Bullish/Short Covering)",
                     "type": "Volume"
                 },
                 "previous_week": {
@@ -1115,17 +1151,18 @@
                     "type": "Volume"
                 },
                 "current_month": {
-                    "POC": 4705.4825,
-                    "VAH": 4707.4,
-                    "VAL": 4703.565,
+                    "POC": 4729.7325,
+                    "VAH": 4731.9,
+                    "VAL": 4727.565,
                     "HVNs": [
-                        4628.7885,
-                        4555.9295
+                        4556.345,
+                        4682.051,
+                        4699.3895
                     ],
                     "LVNs": [
-                        4555.9295,
-                        4628.7885,
-                        4705.4825
+                        4630.0345,
+                        4682.051,
+                        4699.3895
                     ],
                     "single_prints": [],
                     "profile_shape": "P-Shape (Bullish/Short Covering)",
@@ -1154,30 +1191,33 @@
             }
         },
         "OIL": {
-            "close": 96.18,
+            "close": 94.73,
             "AMT_Temporal_Levels": {
                 "current_day": {
-                    "POC": 96.18,
-                    "VAH": 96.18,
-                    "VAL": 96.18,
+                    "POC": 94.73,
+                    "VAH": 94.73,
+                    "VAL": 94.73,
                     "type": "Volume"
                 },
                 "previous_day": {
-                    "POC": 102.27,
-                    "VAH": 102.27,
-                    "VAL": 102.27,
+                    "POC": 94.81,
+                    "VAH": 94.81,
+                    "VAL": 94.81,
                     "type": "Volume"
                 },
                 "current_week": {
-                    "POC": 102.3445,
+                    "POC": 94.8495,
                     "VAH": 106.42,
-                    "VAL": 102.24,
+                    "VAL": 94.73,
                     "HVNs": [
-                        106.3155
+                        95.088,
+                        106.3005,
+                        102.245
                     ],
                     "LVNs": [
-                        102.3445,
-                        106.3155
+                        102.245,
+                        106.3005,
+                        95.088
                     ],
                     "single_prints": [],
                     "profile_shape": "b-Shape (Bearish/Long Liquidation)",
@@ -1202,17 +1242,18 @@
                     "type": "Volume"
                 },
                 "current_month": {
-                    "POC": 102.3445,
+                    "POC": 94.8495,
                     "VAH": 106.42,
-                    "VAL": 102.24,
+                    "VAL": 94.73,
                     "HVNs": [
-                        106.3155,
-                        101.9265
+                        95.088,
+                        106.3005,
+                        102.0065
                     ],
                     "LVNs": [
-                        101.9265,
-                        102.3445,
-                        106.3155
+                        102.245,
+                        102.0065,
+                        106.3005
                     ],
                     "single_prints": [],
                     "profile_shape": "b-Shape (Bearish/Long Liquidation)",
@@ -1241,33 +1282,36 @@
             }
         },
         "COPPER": {
-            "close": 6.178,
+            "close": 6.283,
             "AMT_Temporal_Levels": {
                 "current_day": {
-                    "POC": 6.178,
-                    "VAH": 6.178,
-                    "VAL": 6.178,
+                    "POC": 6.283,
+                    "VAH": 6.283,
+                    "VAL": 6.283,
                     "type": "Volume"
                 },
                 "previous_day": {
-                    "POC": 5.943,
-                    "VAH": 5.943,
-                    "VAL": 5.943,
+                    "POC": 6.1275,
+                    "VAH": 6.1275,
+                    "VAL": 6.1275,
                     "type": "Volume"
                 },
                 "current_week": {
-                    "POC": 6.174,
-                    "VAH": 6.178,
-                    "VAL": 5.936,
+                    "POC": 6.278,
+                    "VAH": 6.283,
+                    "VAL": 6.273,
                     "HVNs": [
-                        5.94
+                        6.129,
+                        6.139,
+                        5.939
                     ],
                     "LVNs": [
-                        5.94,
-                        6.174
+                        5.939,
+                        6.129,
+                        6.139
                     ],
                     "single_prints": [],
-                    "profile_shape": "D-Shape (Balanced)",
+                    "profile_shape": "P-Shape (Bullish/Short Covering)",
                     "type": "Volume"
                 },
                 "previous_week": {
@@ -1289,20 +1333,21 @@
                     "type": "Volume"
                 },
                 "current_month": {
-                    "POC": 5.932,
-                    "VAH": 6.178,
-                    "VAL": 5.928,
+                    "POC": 6.278,
+                    "VAH": 6.283,
+                    "VAL": 6.273,
                     "HVNs": [
-                        6.174,
-                        5.94
+                        5.929,
+                        6.129,
+                        6.139
                     ],
                     "LVNs": [
-                        5.94,
-                        6.174,
-                        5.932
+                        5.939,
+                        6.129,
+                        6.139
                     ],
                     "single_prints": [],
-                    "profile_shape": "b-Shape (Bearish/Long Liquidation)",
+                    "profile_shape": "P-Shape (Bullish/Short Covering)",
                     "type": "Volume"
                 },
                 "previous_month": {
@@ -1328,30 +1373,32 @@
             }
         },
         "VIX": {
-            "close": 17.39,
+            "close": 17.11,
             "AMT_Temporal_Levels": {
                 "current_day": {
-                    "POC": 17.39,
-                    "VAH": 17.39,
-                    "VAL": 17.39,
+                    "POC": 17.11,
+                    "VAH": 17.11,
+                    "VAL": 17.11,
                     "type": "Volume"
                 },
                 "previous_day": {
-                    "POC": 17.38,
-                    "VAH": 17.38,
-                    "VAL": 17.38,
+                    "POC": 17.08,
+                    "VAH": 17.08,
+                    "VAL": 17.08,
                     "type": "Volume"
                 },
                 "current_week": {
-                    "POC": 17.3895,
-                    "VAH": 18.29,
-                    "VAL": 17.38,
+                    "POC": 17.3885,
+                    "VAH": 17.401,
+                    "VAL": 17.105,
                     "HVNs": [
-                        18.2805
+                        17.117,
+                        18.2775
                     ],
                     "LVNs": [
-                        17.3895,
-                        18.2805
+                        17.117,
+                        18.2775,
+                        17.3885
                     ],
                     "single_prints": [],
                     "profile_shape": "b-Shape (Bearish/Long Liquidation)",
@@ -1376,17 +1423,18 @@
                     "type": "TPO"
                 },
                 "current_month": {
-                    "POC": 17.3745,
-                    "VAH": 18.29,
-                    "VAL": 17.361,
+                    "POC": 17.083,
+                    "VAH": 17.414,
+                    "VAL": 17.07,
                     "HVNs": [
-                        17.401,
-                        18.2765
+                        17.1095,
+                        17.3745,
+                        17.401
                     ],
                     "LVNs": [
-                        17.3745,
-                        17.401,
-                        18.2765
+                        17.083,
+                        17.1095,
+                        17.3745
                     ],
                     "single_prints": [],
                     "profile_shape": "b-Shape (Bearish/Long Liquidation)",
@@ -1413,33 +1461,35 @@
             }
         },
         "MOVE": {
-            "close": 86.08,
+            "close": 85.65,
             "AMT_Temporal_Levels": {
                 "current_day": {
+                    "POC": 85.65,
+                    "VAH": 85.65,
+                    "VAL": 85.65,
+                    "type": "Volume"
+                },
+                "previous_day": {
                     "POC": 86.08,
                     "VAH": 86.08,
                     "VAL": 86.08,
                     "type": "Volume"
                 },
-                "previous_day": {
-                    "POC": 85.43,
-                    "VAH": 85.43,
-                    "VAL": 85.43,
-                    "type": "Volume"
-                },
                 "current_week": {
                     "POC": 86.0685,
                     "VAH": 86.08,
-                    "VAL": 85.417,
+                    "VAL": 85.646,
                     "HVNs": [
+                        85.6575,
                         85.4285
                     ],
                     "LVNs": [
                         85.4285,
+                        85.6575,
                         86.0685
                     ],
                     "single_prints": [],
-                    "profile_shape": "D-Shape (Balanced)",
+                    "profile_shape": "P-Shape (Bullish/Short Covering)",
                     "type": "Volume"
                 },
                 "previous_week": {
@@ -1466,12 +1516,13 @@
                     "VAL": 85.6,
                     "HVNs": [
                         85.6115,
+                        85.6575,
                         85.4285
                     ],
                     "LVNs": [
                         85.4285,
-                        85.6115,
-                        86.0685
+                        85.6575,
+                        85.6115
                     ],
                     "single_prints": [],
                     "profile_shape": "P-Shape (Bullish/Short Covering)",
@@ -1498,33 +1549,36 @@
             }
         },
         "BTC": {
-            "close": 81226.4766,
+            "close": 80272.5703,
             "AMT_Temporal_Levels": {
                 "current_day": {
-                    "POC": 81226.4766,
-                    "VAH": 81226.4766,
-                    "VAL": 81226.4766,
+                    "POC": 80272.5703,
+                    "VAH": 80272.5703,
+                    "VAL": 80272.5703,
                     "type": "Volume"
                 },
                 "previous_day": {
-                    "POC": 80927.0547,
-                    "VAH": 80927.0547,
-                    "VAL": 80927.0547,
+                    "POC": 80009.9922,
+                    "VAH": 80009.9922,
+                    "VAL": 80009.9922,
                     "type": "Volume"
                 },
                 "current_week": {
-                    "POC": 81212.2055,
-                    "VAH": 81226.477,
-                    "VAL": 80912.512,
+                    "POC": 81411.2085,
+                    "VAH": 81427.531,
+                    "VAL": 80252.297,
                     "HVNs": [
-                        80926.783
+                        80921.5275,
+                        80268.6195,
+                        80007.456
                     ],
                     "LVNs": [
-                        80926.783,
-                        81212.2055
+                        80007.456,
+                        80268.6195,
+                        80921.5275
                     ],
                     "single_prints": [],
-                    "profile_shape": "D-Shape (Balanced)",
+                    "profile_shape": "P-Shape (Bullish/Short Covering)",
                     "type": "Volume"
                 },
                 "previous_week": {
@@ -1546,21 +1600,21 @@
                     "type": "Volume"
                 },
                 "current_month": {
-                    "POC": 79827.125,
-                    "VAH": 81226.477,
-                    "VAL": 79796.028,
+                    "POC": 79803.2655,
+                    "VAH": 81427.531,
+                    "VAL": 79770.117,
                     "HVNs": [
-                        81195.38,
-                        80946.6065,
-                        78521.0635
+                        81394.383,
+                        80930.307,
+                        80267.3415
                     ],
                     "LVNs": [
-                        78645.4505,
-                        78521.0635,
-                        80946.6065
+                        78676.224,
+                        78543.631,
+                        80002.1555
                     ],
                     "single_prints": [],
-                    "profile_shape": "D-Shape (Balanced)",
+                    "profile_shape": "b-Shape (Bearish/Long Liquidation)",
                     "type": "Volume"
                 },
                 "previous_month": {
@@ -1584,30 +1638,30 @@
             }
         },
         "XLY": {
-            "close": 119.87,
+            "close": 119.88,
             "AMT_Temporal_Levels": {
                 "current_day": {
+                    "POC": 119.88,
+                    "VAH": 119.88,
+                    "VAL": 119.88,
+                    "type": "Volume"
+                },
+                "previous_day": {
                     "POC": 119.87,
                     "VAH": 119.87,
                     "VAL": 119.87,
                     "type": "Volume"
                 },
-                "previous_day": {
-                    "POC": 118.07,
-                    "VAH": 118.07,
-                    "VAL": 118.07,
-                    "type": "Volume"
-                },
                 "current_week": {
-                    "POC": 119.848,
-                    "VAH": 119.87,
-                    "VAL": 118.027,
+                    "POC": 119.858,
+                    "VAH": 119.88,
+                    "VAL": 119.836,
                     "HVNs": [
-                        118.049
+                        118.051
                     ],
                     "LVNs": [
-                        118.049,
-                        119.848
+                        118.051,
+                        119.858
                     ],
                     "single_prints": [],
                     "profile_shape": "D-Shape (Balanced)",
@@ -1632,20 +1686,20 @@
                     "type": "Volume"
                 },
                 "current_month": {
-                    "POC": 118.6195,
-                    "VAH": 119.87,
-                    "VAL": 118.598,
+                    "POC": 119.858,
+                    "VAH": 119.88,
+                    "VAL": 118.602,
                     "HVNs": [
-                        119.848,
-                        118.049
+                        118.624,
+                        118.051
                     ],
                     "LVNs": [
-                        118.049,
-                        119.848,
-                        118.6195
+                        118.051,
+                        118.624,
+                        119.858
                     ],
                     "single_prints": [],
-                    "profile_shape": "b-Shape (Bearish/Long Liquidation)",
+                    "profile_shape": "P-Shape (Bullish/Short Covering)",
                     "type": "Volume"
                 },
                 "previous_month": {
@@ -1669,33 +1723,35 @@
             }
         },
         "XLP": {
-            "close": 84.24,
+            "close": 83.98,
             "AMT_Temporal_Levels": {
                 "current_day": {
+                    "POC": 83.98,
+                    "VAH": 83.98,
+                    "VAL": 83.98,
+                    "type": "Volume"
+                },
+                "previous_day": {
                     "POC": 84.24,
                     "VAH": 84.24,
                     "VAL": 84.24,
                     "type": "Volume"
                 },
-                "previous_day": {
-                    "POC": 84.06,
-                    "VAH": 84.06,
-                    "VAL": 84.06,
-                    "type": "Volume"
-                },
                 "current_week": {
                     "POC": 84.233,
                     "VAH": 84.24,
-                    "VAL": 84.054,
+                    "VAL": 83.969,
                     "HVNs": [
-                        84.0615
+                        84.0615,
+                        83.976
                     ],
                     "LVNs": [
+                        83.976,
                         84.0615,
                         84.233
                     ],
                     "single_prints": [],
-                    "profile_shape": "D-Shape (Balanced)",
+                    "profile_shape": "P-Shape (Bullish/Short Covering)",
                     "type": "Volume"
                 },
                 "previous_week": {
@@ -1722,15 +1778,16 @@
                     "VAL": 84.054,
                     "HVNs": [
                         84.233,
-                        84.0615
+                        84.0615,
+                        83.976
                     ],
                     "LVNs": [
+                        83.976,
                         84.0615,
-                        84.233,
-                        84.176
+                        84.233
                     ],
                     "single_prints": [],
-                    "profile_shape": "b-Shape (Bearish/Long Liquidation)",
+                    "profile_shape": "D-Shape (Balanced)",
                     "type": "Volume"
                 },
                 "previous_month": {
@@ -1754,33 +1811,35 @@
             }
         },
         "TLT": {
-            "close": 86.08,
+            "close": 85.65,
             "AMT_Temporal_Levels": {
                 "current_day": {
+                    "POC": 85.65,
+                    "VAH": 85.65,
+                    "VAL": 85.65,
+                    "type": "Volume"
+                },
+                "previous_day": {
                     "POC": 86.08,
                     "VAH": 86.08,
                     "VAL": 86.08,
                     "type": "Volume"
                 },
-                "previous_day": {
-                    "POC": 85.43,
-                    "VAH": 85.43,
-                    "VAL": 85.43,
-                    "type": "Volume"
-                },
                 "current_week": {
                     "POC": 86.0685,
                     "VAH": 86.08,
-                    "VAL": 85.417,
+                    "VAL": 85.646,
                     "HVNs": [
+                        85.6575,
                         85.4285
                     ],
                     "LVNs": [
                         85.4285,
+                        85.6575,
                         86.0685
                     ],
                     "single_prints": [],
-                    "profile_shape": "D-Shape (Balanced)",
+                    "profile_shape": "P-Shape (Bullish/Short Covering)",
                     "type": "Volume"
                 },
                 "previous_week": {
@@ -1807,12 +1866,13 @@
                     "VAL": 85.6,
                     "HVNs": [
                         85.6115,
+                        85.6575,
                         85.4285
                     ],
                     "LVNs": [
                         85.4285,
-                        85.6115,
-                        86.0685
+                        85.6575,
+                        85.6115
                     ],
                     "single_prints": [],
                     "profile_shape": "P-Shape (Bullish/Short Covering)",
@@ -1845,12 +1905,12 @@
         "catalysts": []
     },
     "asset_metadata": {
-        "error": "Cannot mask with non-boolean array containing NA / NaN values",
-        "type": "N/A"
+        "symbol": "GC=F",
+        "type": "Other/Global"
     },
     "market_regime": {
         "regime": "recession",
-        "regime_name": "الركود الانكماشي (Recession)",
+        "regime_name": "الركود الانكماشي (Recession) (Macro confirmation: stagflation)",
         "confidence": 50.0,
         "scores": {
             "goldilocks": 1,
@@ -1859,224 +1919,228 @@
             "reflation": 0
         },
         "signals": [
-            "⚠️ منحنى العائد منعكس (-77.9 bps) → إشارة ركود"
+            "⚠️ منحنى العائد منعكس (-77.8 bps) → إشارة ركود",
+            "⚡ صعود هش (NDX/RUT=10.06) → سيولة مركزة في التكنولوجيا"
         ],
-        "warnings": [],
+        "warnings": [
+            "FRAGILE_RALLY",
+            "STRUCTURAL_DIVERGENCE_DETECTED"
+        ],
         "halt_algorithms": false
     },
     "layer_9_options_gex": {
         "SPX": {
-            "current_gex": "Negative",
-            "call_wall": 7504.59,
-            "put_wall": 7225.65,
-            "gamma_flip": 7365.12,
+            "current_gex": "Positive",
+            "call_wall": 7653.47,
+            "put_wall": 7020.75,
+            "gamma_flip": 7124.77,
             "liquidity_zones": [
-                7504.59,
-                7225.65
+                7653.47,
+                7020.75
             ]
         },
         "NDX": {
-            "current_gex": "Negative",
-            "call_wall": 29295.92,
-            "put_wall": 27902.43,
-            "gamma_flip": 28599.17,
+            "current_gex": "Positive",
+            "call_wall": 30146.09,
+            "put_wall": 26981.81,
+            "gamma_flip": 26957.98,
             "liquidity_zones": [
-                29295.92,
-                27902.43
+                30146.09,
+                26981.81
             ]
         },
         "RUT": {
-            "current_gex": "Negative",
-            "call_wall": 2962.75,
-            "put_wall": 2810.8,
-            "gamma_flip": 2886.77,
+            "current_gex": "Positive",
+            "call_wall": 3011.94,
+            "put_wall": 2667.32,
+            "gamma_flip": 2769.31,
             "liquidity_zones": [
-                2962.75,
-                2810.8
+                3011.94,
+                2667.32
             ]
         },
         "MSCI_EM": {
-            "current_gex": "Negative",
-            "call_wall": 69.98,
-            "put_wall": 65.0,
-            "gamma_flip": 67.49,
+            "current_gex": "Positive",
+            "call_wall": 72.2,
+            "put_wall": 60.98,
+            "gamma_flip": 63.4,
             "liquidity_zones": [
-                69.98,
-                65.0
+                72.2,
+                60.98
             ]
         },
         "US10Y": {
-            "current_gex": "Negative",
-            "call_wall": 4.45,
-            "put_wall": 4.26,
-            "gamma_flip": 4.36,
+            "current_gex": "Positive",
+            "call_wall": 4.6,
+            "put_wall": 4.18,
+            "gamma_flip": 4.33,
             "liquidity_zones": [
-                4.45,
-                4.26
+                4.6,
+                4.18
             ]
         },
         "US02Y": {
             "current_gex": "Negative",
-            "call_wall": 82.47,
-            "put_wall": 82.13,
-            "gamma_flip": 82.3,
+            "call_wall": 82.62,
+            "put_wall": 81.84,
+            "gamma_flip": 82.25,
             "liquidity_zones": [
-                82.47,
-                82.13
+                82.62,
+                81.84
             ]
         },
         "TIPS": {
-            "current_gex": "Negative",
-            "call_wall": 111.67,
-            "put_wall": 110.63,
-            "gamma_flip": 111.15,
+            "current_gex": "Positive",
+            "call_wall": 112.21,
+            "put_wall": 109.85,
+            "gamma_flip": 110.96,
             "liquidity_zones": [
-                111.67,
-                110.63
+                112.21,
+                109.85
             ]
         },
         "HY_SPREAD": {
             "current_gex": "Negative",
-            "call_wall": 80.7,
-            "put_wall": 79.62,
-            "gamma_flip": 80.16,
+            "call_wall": 81.11,
+            "put_wall": 78.61,
+            "gamma_flip": 79.97,
             "liquidity_zones": [
-                80.7,
-                79.62
+                81.11,
+                78.61
             ]
         },
         "DXY": {
             "current_gex": "Negative",
-            "call_wall": 98.78,
-            "put_wall": 97.25,
-            "gamma_flip": 98.01,
+            "call_wall": 99.65,
+            "put_wall": 96.28,
+            "gamma_flip": 98.34,
             "liquidity_zones": [
-                98.78,
-                97.25
+                99.65,
+                96.28
             ]
         },
         "EURUSD": {
-            "current_gex": "Negative",
-            "call_wall": 1.19,
-            "put_wall": 1.16,
-            "gamma_flip": 1.18,
+            "current_gex": "Positive",
+            "call_wall": 1.2,
+            "put_wall": 1.15,
+            "gamma_flip": 1.17,
             "liquidity_zones": [
-                1.19,
-                1.16
+                1.2,
+                1.15
             ]
         },
         "USDJPY": {
             "current_gex": "Negative",
-            "call_wall": 158.05,
-            "put_wall": 154.8,
-            "gamma_flip": 156.42,
+            "call_wall": 160.45,
+            "put_wall": 153.07,
+            "gamma_flip": 158.65,
             "liquidity_zones": [
-                158.05,
-                154.8
+                160.45,
+                153.07
             ]
         },
         "GOLD": {
-            "current_gex": "Negative",
-            "call_wall": 4892.24,
-            "put_wall": 4522.56,
-            "gamma_flip": 4707.4,
+            "current_gex": "Positive",
+            "call_wall": 5148.17,
+            "put_wall": 4316.63,
+            "gamma_flip": 4696.07,
             "liquidity_zones": [
-                4892.24,
-                4522.56
+                5148.17,
+                4316.63
             ]
         },
         "OIL": {
             "current_gex": "Negative",
-            "call_wall": 106.24,
-            "put_wall": 86.02,
-            "gamma_flip": 96.13,
+            "call_wall": 117.58,
+            "put_wall": 72.02,
+            "gamma_flip": 96.44,
             "liquidity_zones": [
-                106.24,
-                86.02
+                117.58,
+                72.02
             ]
         },
         "COPPER": {
-            "current_gex": "Negative",
-            "call_wall": 6.38,
-            "put_wall": 5.97,
-            "gamma_flip": 6.18,
+            "current_gex": "Positive",
+            "call_wall": 6.75,
+            "put_wall": 5.82,
+            "gamma_flip": 6.03,
             "liquidity_zones": [
-                6.38,
-                5.97
+                6.75,
+                5.82
             ]
         },
         "VIX": {
             "current_gex": "Negative",
-            "call_wall": 20.28,
-            "put_wall": 14.5,
-            "gamma_flip": 17.39,
+            "call_wall": 23.39,
+            "put_wall": 10.81,
+            "gamma_flip": 18.11,
             "liquidity_zones": [
-                20.28,
-                14.5
+                23.39,
+                10.81
             ]
         },
         "MOVE": {
             "current_gex": "Negative",
-            "call_wall": 87.19,
-            "put_wall": 84.97,
-            "gamma_flip": 86.08,
+            "call_wall": 88.17,
+            "put_wall": 83.13,
+            "gamma_flip": 86.06,
             "liquidity_zones": [
-                87.19,
-                84.97
+                88.17,
+                83.13
             ]
         },
         "BTC": {
-            "current_gex": "Negative",
-            "call_wall": 84881.13,
-            "put_wall": 77602.87,
-            "gamma_flip": 81242.0,
+            "current_gex": "Positive",
+            "call_wall": 88486.74,
+            "put_wall": 72058.4,
+            "gamma_flip": 77995.79,
             "liquidity_zones": [
-                84881.13,
-                77602.87
+                88486.74,
+                72058.4
             ]
         },
         "XLY": {
-            "current_gex": "Negative",
-            "call_wall": 123.04,
-            "put_wall": 116.7,
-            "gamma_flip": 119.87,
+            "current_gex": "Positive",
+            "call_wall": 127.09,
+            "put_wall": 112.67,
+            "gamma_flip": 117.89,
             "liquidity_zones": [
-                123.04,
-                116.7
+                127.09,
+                112.67
             ]
         },
         "XLP": {
-            "current_gex": "Negative",
-            "call_wall": 85.82,
-            "put_wall": 82.66,
-            "gamma_flip": 84.24,
+            "current_gex": "Positive",
+            "call_wall": 87.55,
+            "put_wall": 80.41,
+            "gamma_flip": 82.8,
             "liquidity_zones": [
-                85.82,
-                82.66
+                87.55,
+                80.41
             ]
         },
         "TLT": {
             "current_gex": "Negative",
-            "call_wall": 87.19,
-            "put_wall": 84.97,
-            "gamma_flip": 86.08,
+            "call_wall": 88.17,
+            "put_wall": 83.13,
+            "gamma_flip": 86.06,
             "liquidity_zones": [
-                87.19,
-                84.97
+                88.17,
+                83.13
             ]
         }
     },
     "layer_2_macro": {
-        "timestamp": "2026-05-07T00:31:21.926623",
-        "macro_score": 64,
-        "regime": "Goldilocks",
+        "timestamp": "2026-05-08T11:29:59.362733",
+        "macro_score": 61,
+        "regime": "Stagflation",
         "z_scores": {
-            "US10Y": 0.4178843290965361,
-            "VIX": -0.8529464650057058,
-            "DXY": -1.138495123283681,
-            "HYG": 0.8631166066473382,
-            "TLT": 0.004751555716461739,
-            "SPX": 1.5160521014717105,
+            "US10Y": 1.0236739266988417,
+            "VIX": -0.8121633655805135,
+            "DXY": -1.0810231457598483,
+            "HYG": 0.3694726657045651,
+            "TLT": -0.8041045740011435,
+            "SPX": 1.3237796611858224,
             "HYG_TLT": 0.0
         },
         "macro_stats": {
@@ -2102,38 +2166,153 @@
             }
         },
         "raw_market_prices": {
-            "US10Y": 4.355999946594238,
-            "VIX": 17.389999389648438,
-            "DXY": 98.01499938964844,
-            "HYG": 80.16000366210938,
-            "TLT": 86.08000183105469,
-            "SPX": 7365.1201171875,
+            "US10Y": 4.392000198364258,
+            "VIX": 17.100000381469727,
+            "DXY": 97.96600341796875,
+            "HYG": 79.86000061035156,
+            "TLT": 85.6500015258789,
+            "SPX": 7337.10986328125,
             "CreditSpreadProxy": NaN
         }
     },
     "layer_3_correlation": {
-        "error": "Insufficient data to compute correlations. Try again during market hours or check connectivity."
+        "timestamp": "2026-05-08T11:30:00.858037Z",
+        "correlation_matrix": {
+            "BTC_ETH": 0.5620915364285133,
+            "BTC_SOL": 0.5012112951508071,
+            "BTC_NASDAQ": 0.9341300703358192,
+            "BTC_GOLD": -0.5119653257685342,
+            "BTC_DXY": -0.3642480793844552,
+            "BTC_US10Y": 0.5509774102015208,
+            "ETH_SOL": 0.6908553406758243,
+            "ETH_NASDAQ": 0.41276991629775184,
+            "ETH_GOLD": 0.1185494405339775,
+            "ETH_US10Y": -0.14567841062000206,
+            "SOL_US10Y": -0.17160146805257426,
+            "NASDAQ_SOL": 0.38568116164602445,
+            "NASDAQ_US10Y": 0.5824768648798634,
+            "GOLD_SOL": 0.3011145162896022,
+            "GOLD_NASDAQ": -0.5373580556866216,
+            "GOLD_US10Y": -0.9248038352061568,
+            "DXY_ETH": -0.5720829806824084,
+            "DXY_SOL": -0.44319200110317075,
+            "DXY_NASDAQ": -0.42316447245233124,
+            "DXY_GOLD": -0.2484186770899465,
+            "DXY_US10Y": 0.14646326487345057
+        },
+        "lead_lag_info": {
+            "BTC_leads_ETH": false,
+            "te_BTC_to_ETH": 0.6082687569440783,
+            "BTC_leads_SOL": false,
+            "te_BTC_to_SOL": 1.2368651643350994,
+            "BTC_leads_NASDAQ": false,
+            "te_BTC_to_NASDAQ": 0.5354815475160253,
+            "BTC_leads_GOLD": false,
+            "te_BTC_to_GOLD": 0.7654301867212839,
+            "BTC_leads_DXY": false,
+            "te_BTC_to_DXY": 1.0370086415940958,
+            "BTC_leads_US10Y": false,
+            "te_BTC_to_US10Y": 0.8464017862293973,
+            "ETH_leads_BTC": false,
+            "te_ETH_to_BTC": 0.29046978429094644,
+            "ETH_leads_SOL": true,
+            "te_ETH_to_SOL": 0.9152038547082677,
+            "ETH_leads_NASDAQ": false,
+            "te_ETH_to_NASDAQ": 0.5947726188415745,
+            "ETH_leads_GOLD": false,
+            "te_ETH_to_GOLD": 0.9559063771974744,
+            "ETH_leads_DXY": false,
+            "te_ETH_to_DXY": 0.8105854272053592,
+            "ETH_leads_US10Y": false,
+            "te_ETH_to_US10Y": 0.751163690991302,
+            "SOL_leads_BTC": true,
+            "te_SOL_to_BTC": 0.6840251417428704,
+            "SOL_leads_ETH": false,
+            "te_SOL_to_ETH": 0.9065860191579072,
+            "SOL_leads_NASDAQ": true,
+            "te_SOL_to_NASDAQ": 0.5588255949290284,
+            "SOL_leads_GOLD": true,
+            "te_SOL_to_GOLD": 0.9559063771974743,
+            "SOL_leads_DXY": false,
+            "te_SOL_to_DXY": 0.6560562606417147,
+            "SOL_leads_US10Y": true,
+            "te_SOL_to_US10Y": 0.8464017862293973,
+            "NASDAQ_leads_BTC": false,
+            "te_NASDAQ_to_BTC": 0.09999359381475595,
+            "NASDAQ_leads_ETH": false,
+            "te_NASDAQ_to_ETH": 0.6208717334436213,
+            "NASDAQ_leads_SOL": false,
+            "te_NASDAQ_to_SOL": 0.8433098068831756,
+            "NASDAQ_leads_GOLD": false,
+            "te_NASDAQ_to_GOLD": 0.5982980436580965,
+            "NASDAQ_leads_DXY": false,
+            "te_NASDAQ_to_DXY": 0.8184329051282416,
+            "NASDAQ_leads_US10Y": false,
+            "te_NASDAQ_to_US10Y": 0.46544940527701634,
+            "GOLD_leads_BTC": false,
+            "te_GOLD_to_BTC": 0.4576019273541339,
+            "GOLD_leads_ETH": false,
+            "te_GOLD_to_ETH": 1.0970622096340976,
+            "GOLD_leads_SOL": false,
+            "te_GOLD_to_SOL": 1.1056800451844584,
+            "GOLD_leads_NASDAQ": false,
+            "te_GOLD_to_NASDAQ": 0.5947726188415745,
+            "GOLD_leads_DXY": false,
+            "te_GOLD_to_DXY": 0.9543735228555436,
+            "GOLD_leads_US10Y": false,
+            "te_GOLD_to_US10Y": 0.2935617636371681,
+            "DXY_leads_BTC": false,
+            "te_DXY_to_BTC": 0.48094597476713696,
+            "DXY_leads_ETH": false,
+            "te_DXY_to_ETH": 1.0251681618090054,
+            "DXY_leads_SOL": false,
+            "te_DXY_to_SOL": 0.7840187355576262,
+            "DXY_leads_NASDAQ": false,
+            "te_DXY_to_NASDAQ": 0.49477902502681853,
+            "DXY_leads_GOLD": false,
+            "te_DXY_to_GOLD": 0.7061391153957348,
+            "DXY_leads_US10Y": false,
+            "te_DXY_to_US10Y": 0.5606875005151115,
+            "US10Y_leads_BTC": false,
+            "te_US10Y_to_BTC": 0.6480781178303243,
+            "US10Y_leads_ETH": false,
+            "te_US10Y_to_ETH": 1.0018241143960023,
+            "US10Y_leads_SOL": false,
+            "te_US10Y_to_SOL": 0.9152038547082678,
+            "US10Y_leads_NASDAQ": false,
+            "te_US10Y_to_NASDAQ": 0.34500535703983487,
+            "US10Y_leads_GOLD": false,
+            "te_US10Y_to_GOLD": 0.212590164129055,
+            "US10Y_leads_DXY": false,
+            "te_US10Y_to_DXY": 0.6327122132287117
+        },
+        "decoupling_alerts": {},
+        "price_snapshot": {
+            "BTC": 80009.9921875,
+            "ETH": 2291.107666015625,
+            "SOL": 88.40478515625,
+            "NASDAQ": 25806.19921875,
+            "GOLD": 4699.7998046875,
+            "DXY": 98.25,
+            "US10Y": 4.392000198364258
+        },
+        "data_points": 22
     },
-    "layer_4_smart_money": "QUIVER_API_KEY missing. Smart Money data skipped.",
+    "layer_4_smart_money": {
+        "status": "Searching OSINT sources (HouseStockWatcher, SenateStockWatcher, QuiverQuant)",
+        "congress_trades": "N/A",
+        "insider_trades": "N/A"
+    },
     "layer_5_liquidity": "Sentiment tools or news not available",
     "layer_7_mining": {
         "giants": [
             {
-                "ticker": "NEM",
-                "name": "Newmont Corporation",
-                "f_score": 4,
-                "roe": 25.83,
-                "net_margin": 33.87,
-                "dupont_roe": 25.83,
-                "status": "Strong"
-            },
-            {
                 "ticker": "GOLD",
                 "name": "Gold.com, Inc.",
                 "f_score": 3,
-                "roe": 2.04,
-                "net_margin": 0.08,
-                "dupont_roe": 2.04,
+                "roe": 10.82,
+                "net_margin": 0.35,
+                "dupont_roe": 10.82,
                 "status": "Strong"
             },
             {
@@ -2164,7 +2343,7 @@
                 "status": "Strong"
             }
         ],
-        "arbitrage_status": "ALIGNED"
+        "arbitrage_status": "N/A"
     },
     "layer_8_catalysts": [],
     "layer_12_signal_evolution": {
@@ -2172,9 +2351,9 @@
         "historical_context": "Integrated with Signal Tracker skill"
     },
     "layer_13_institutional": {
-        "timestamp": "2026-05-07T00:31:26.783128",
+        "timestamp": "2026-05-08T11:30:34.980163",
         "dark_pool_intel": {
-            "error": "\n[Error] -> No executive data found for XAU=F"
+            "error": "\n[Error] -> No executive data found for GC=F"
         },
         "macro_surprises": {
             "country": {
@@ -2242,9 +2421,6 @@
             }
         }
     },
-    "layer_14_toolkit_analytics": {
-        "error": "The datasets could not be populated and therefore the Ratios class cannot be initialized. This is usually because no tickers are equities, you have reached the API limit or entered an invalid API key.",
-        "source": "FinanceToolkit"
-    },
+    "layer_14_toolkit_analytics": "Skipped: FinanceToolkit only supports Equity assets. For Futures/Indices, see AMT levels.",
     "layer_6_alt_data": "Integrated via Smart Money/Logistics/OpenBB/FinanceToolkit"
 }

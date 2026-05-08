@@ -20,15 +20,25 @@ class OptionsGexEngine:
             close = close.iloc[0]
 
         # محاكاة مستويات GEX الكبرى (حوائط العقود)
-        # عادة ما تكون عند مستويات دائرية (Round Numbers) أو مستويات AMT كبرى
-        volatility = df['Close'].pct_change().std()
+        # استخدام التقلب السنوي لتقدير الحدود
+        returns = df['Close'].pct_change().dropna()
+        if isinstance(returns, pd.DataFrame): returns = returns.iloc[:, 0]
 
-        call_wall = float(close * (1 + 2 * volatility))
-        put_wall = float(close * (1 - 2 * volatility))
-        gamma_flip = float(close) # Simplified
+        volatility = returns.std() * np.sqrt(252) # Annualized Vol
+
+        # تقدير مستويات غاما بناءً على المستويات النفسية والتقلب
+        # الحوائط عادة ما تكون عند 1-2 انحراف معياري شهري
+        monthly_vol = volatility / np.sqrt(12)
+
+        call_wall = float(close * (1 + monthly_vol))
+        put_wall = float(close * (1 - monthly_vol))
+
+        # Gamma Flip: نقطة التعادل؛ عادة ما تكون قريبة من المتوسط المتحرك 20 يوم
+        gamma_flip = float(df['Close'].tail(20).mean())
+        if isinstance(gamma_flip, pd.Series): gamma_flip = gamma_flip.iloc[0]
 
         return {
-            "current_gex": "Positive" if close > gamma_flip else "Negative",
+            "current_gex": "Positive" if float(close) > gamma_flip else "Negative",
             "call_wall": round(call_wall, 2),
             "put_wall": round(put_wall, 2),
             "gamma_flip": round(gamma_flip, 2),

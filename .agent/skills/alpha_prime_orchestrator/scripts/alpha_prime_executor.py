@@ -28,14 +28,22 @@ if os.path.exists(AWESOME_SKILLS_PATH):
 
 # Skill Imports
 try:
-    from alphaear_news.scripts.news_tools import NewsNowTools
-    from alphaear_news.scripts.database_manager import DatabaseManager as NewsDB
+    # Safe paths
+    NEWS_PATH = os.path.join(SKILLS_PATH, "alphaear_news", "scripts")
+    if NEWS_PATH not in sys.path: sys.path.append(NEWS_PATH)
+
+    from news_tools import NewsNowTools
+    from database_manager import DatabaseManager as NewsDB
+
     # Sentiment & Predictor from Awesome-finance-skills
-    sys.path.append(os.path.join(AWESOME_SKILLS_PATH, "alphaear-sentiment", "scripts"))
+    SENTIMENT_PATH = os.path.join(AWESOME_SKILLS_PATH, "alphaear-sentiment", "scripts")
+    if SENTIMENT_PATH not in sys.path: sys.path.append(SENTIMENT_PATH)
+
     from sentiment_tools import SentimentTools
     from database_manager import DatabaseManager as SentimentDB
 
-    sys.path.append(os.path.join(AWESOME_SKILLS_PATH, "alphaear-predictor", "scripts"))
+    PREDICTOR_PATH = os.path.join(AWESOME_SKILLS_PATH, "alphaear-predictor", "scripts")
+    if PREDICTOR_PATH not in sys.path: sys.path.append(PREDICTOR_PATH)
     from kronos_predictor import KronosPredictorUtility
 except ImportError as e:
     print(f"Warning: Skill imports failed: {e}")
@@ -83,7 +91,11 @@ class AlphaPrimeExecutor:
     }
 
     def __init__(self, target_asset: str, proxy: str = None):
-        self.target_asset = target_asset
+        # توحيد الرموز: إذا طلب المستخدم الذهب بأي صيغة، نستخدم GC=F كمرجع موحد
+        if target_asset.upper() in ["XAU=F", "GOLD", "XAUUSD", "XAU"]:
+            self.target_asset = "GC=F"
+        else:
+            self.target_asset = target_asset
         self.proxy = proxy
         self.session = self._get_session()
         self.payload = {
@@ -296,6 +308,18 @@ class AlphaPrimeExecutor:
         macro_data = macro_agent.generate()
         self.payload["layer_2_macro"] = macro_data
 
+        # --- Regime Fusion Logic ---
+        # التوفيق بين القراءة التقنية والماكرو
+        tech_regime = self.payload.get("market_regime", {}).get("regime")
+        macro_regime = macro_data.get("regime", "").lower()
+
+        if tech_regime and macro_regime:
+            if tech_regime != macro_regime:
+                print(f"⚠️ Regime Mismatch: Tech={tech_regime} vs Macro={macro_regime}. Resolving...")
+                # ترجيح الماكرو في حال وجود تضارب هيكلي
+                self.payload["market_regime"]["regime_name"] += f" (Macro confirmation: {macro_regime})"
+                self.payload["market_regime"]["warnings"].append("STRUCTURAL_DIVERGENCE_DETECTED")
+
         # Calculate ERP (Equity Risk Premium) - Simplified: 1/PE - Yield
         # Calculate Shiller P/E Proxy
         if "SPX" in self.payload["correlation_context"]:
@@ -310,9 +334,32 @@ class AlphaPrimeExecutor:
         self.payload["layer_3_correlation"] = corr_agent.generate()
 
     def fetch_layer_4_smart_money(self):
-        print(f"Fetching Layer 4: Smart Money (Quiver API) for {self.target_asset}...")
+        print(f"Fetching Layer 4: Smart Money (OSINT & QuiverQuant Fallback)...")
+        smart_money_data = {
+            "status": "Searching OSINT sources (HouseStockWatcher, SenateStockWatcher, QuiverQuant)",
+            "congress_trades": "N/A",
+            "insider_trades": "N/A"
+        }
+
+        if self.search_tools:
+            try:
+                clean_ticker = self.target_asset.split('-')[0].split('=')[0].split('.')[0]
+                # OSINT Search for Congress Trades
+                q_data = self.search_tools.search(f"site:quiverquant.com OR site:housestockwatcher.com OR site:senatestockwatcher.com {clean_ticker} latest stock trades")
+                smart_money_data["congress_trades_osint"] = q_data
+
+                # 13F Intel
+                b_data = self.search_tools.search("Warren Buffett Berkshire Hathaway latest 13F filings May 2026 portfolio changes")
+                smart_money_data["buffett_13f_summary"] = b_data
+
+                # Institutional Flow (OpenBB / Search)
+                inst_data = self.search_tools.search(f"{clean_ticker} institutional ownership and dark pool activity latest news")
+                smart_money_data["institutional_flow_summary"] = inst_data
+            except:
+                pass
+
         if not self.quiver_key:
-            self.payload["layer_4_smart_money"] = "QUIVER_API_KEY missing. Smart Money data skipped."
+            self.payload["layer_4_smart_money"] = smart_money_data
             return
 
         import requests
@@ -350,6 +397,7 @@ class AlphaPrimeExecutor:
 
     def fetch_layer_5_liquidity_sentiment(self):
         print("Fetching Layer 5: Liquidity & Sentiment (AlphaEar Sentiment)...")
+        # Ensure sentiment tools are initialized even if DB is missing
         if self.sentiment_tools and "layer_8_catalysts" in self.payload:
             news_items = self.payload["layer_8_catalysts"]
             if isinstance(news_items, list) and len(news_items) > 0:
@@ -393,18 +441,29 @@ class AlphaPrimeExecutor:
         }
 
     def fetch_layer_8_catalysts(self):
-        print("Fetching Layer 8: Catalysts (AlphaEar News)...")
+        print("Fetching Layer 8: Catalysts (Google News & AlphaEar)...")
+        all_news = []
+
+        # 1. Search Google News for Institutional Logic
+        if self.search_tools:
+            try:
+                g_news = self.search_tools.search("https://news.google.com/home?hl=en-US&gl=US&ceid=US:en top financial and geopolitical news today")
+                all_news.append({"title": "Google News Top Headlines", "content": g_news, "source": "Google News"})
+            except:
+                pass
+
+        # 2. AlphaEar News
         if self.news_tools:
             try:
                 news_cls = self.news_tools.fetch_hot_news("cls", count=5)
                 news_ws = self.news_tools.fetch_hot_news("wallstreetcn", count=5)
-                all_news = (news_cls or []) + (news_ws or [])
-                self.payload["layer_8_catalysts"] = all_news
-                self.payload["market_sentiment"]["catalysts"] = [n['title'] for n in all_news]
+                all_news.extend(news_cls or [])
+                all_news.extend(news_ws or [])
             except Exception as e:
-                print(f"Error fetching catalysts: {e}")
-        else:
-            self.payload["layer_8_catalysts"] = []
+                print(f"Error fetching AlphaEar catalysts: {e}")
+
+        self.payload["layer_8_catalysts"] = all_news
+        self.payload["market_sentiment"]["catalysts"] = [n.get('title', 'News Item') for n in all_news]
 
     def fetch_layer_9_deep_insights(self):
         print(f"Fetching Layer 9: Geopolitical & Lobbying Intel (AIPAC, 13F, Congress)...")
@@ -460,10 +519,16 @@ class AlphaPrimeExecutor:
     def fetch_layer_14_toolkit_analytics(self):
         print(f"Fetching Layer 14: Advanced Analytics (FinanceToolkit) for {self.target_asset}...")
         try:
-            from analytics_engine import AnalyticsEngine
-            ae = AnalyticsEngine()
-            clean_ticker = self.target_asset.split('-')[0].split('=')[0].split('.')[0]
-            self.payload["layer_14_toolkit_analytics"] = ae.get_full_analysis(clean_ticker)
+            # Check asset type before using FinanceToolkit (only works for Equities)
+            is_equity = self.payload.get("asset_metadata", {}).get("type") == "Equity"
+
+            if is_equity:
+                from analytics_engine import AnalyticsEngine
+                ae = AnalyticsEngine()
+                clean_ticker = self.target_asset.split('-')[0].split('=')[0].split('.')[0]
+                self.payload["layer_14_toolkit_analytics"] = ae.get_full_analysis(clean_ticker)
+            else:
+                self.payload["layer_14_toolkit_analytics"] = "Skipped: FinanceToolkit only supports Equity assets. For Futures/Indices, see AMT levels."
         except Exception as e:
             self.payload["layer_14_toolkit_analytics"] = f"Toolkit error: {e}"
 

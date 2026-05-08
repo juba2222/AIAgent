@@ -131,6 +131,10 @@ class RegimeDetector:
         total_score = sum(scores.values())
         confidence = round(scores[regime] / max(total_score, 1) * 100, 1)
 
+        # Regime Fusion Logic: التوفيق مع بيانات الماكرو لتجنب التناقض
+        # إذا كان منحنى العائد منعكساً (Recession) والبطالة منخفضة، فهذا تحول هيكلي
+        # سنقوم بدمج منطق الماكرو لاحقاً في المنسق (Executor)
+
         regime_names = {
             "goldilocks": "النمو المستقر (Goldilocks)",
             "stagflation": "التضخم الركودي (Stagflation) ⚠️",

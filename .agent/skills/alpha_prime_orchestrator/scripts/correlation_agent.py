@@ -41,7 +41,7 @@ class CorrelationAgent:
     # ---------------------------------------------------------------------
     # Helper: fetch minute‑level OHLCV from yfinance
     # ---------------------------------------------------------------------
-    def _fetch_yf_series(self, ticker, period='7d', interval='1h'): # Switched to 1h for more stability across weekends
+    def _fetch_yf_series(self, ticker, period='1mo', interval='1d'): # Increased period for better availability
         try:
             data = yf.download(tickers=ticker, period=period, interval=interval, progress=False)
             if data.empty:

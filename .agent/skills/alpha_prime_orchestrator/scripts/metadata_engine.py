@@ -28,7 +28,9 @@ class MetadataEngine:
                 }
 
             # البحث عن أقرب تطابق إذا لم يكن الرمز دقيقاً (بدون لاحقة البورصة)
-            matches = equities[equities.index.str.startswith(clean_ticker)]
+            # معالجة قيم NaN في الفهرس لتجنب أخطاء الفلترة
+            equities = equities[equities.index.notna()]
+            matches = equities[equities.index.str.startswith(clean_ticker, na=False)]
             if not matches.empty:
                 info = matches.iloc[0]
                 return {
