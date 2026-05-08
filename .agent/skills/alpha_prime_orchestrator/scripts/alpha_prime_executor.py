@@ -187,8 +187,8 @@ class AlphaPrimeExecutor:
             
         return session
 
-    def fetch_ohlcv_data(self, ticker: str, period="3mo", interval="1d"):
-        """جلب البيانات مع استراتيجية تجنب الحظر"""
+    def fetch_ohlcv_data(self, ticker: str, period="1mo", interval="1h"):
+        """جلب البيانات بدقة ساعوية لضمان دقة مستويات AMT/TPO"""
         try:
             # إضافة تأخير بسيط وعشوائي (0.5 إلى 2 ثانية) لتجنب كشف البوت
             time.sleep(random.uniform(0.5, 2.0))

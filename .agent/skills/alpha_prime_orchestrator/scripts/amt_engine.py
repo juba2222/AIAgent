@@ -32,11 +32,15 @@ class AMTEngine:
         if hasattr(max_p, 'item'): max_p = max_p.item()
         
         if float(min_p) == float(max_p):
+            # محاكاة التوزيع في حال توفر نقطة سعرية واحدة (للمحافظة على منطق المزاد)
+            volatility_proxy = float(min_p) * 0.001 # 0.1% Range estimation
             return {
                 "POC": round(float(min_p), 4),
-                "VAH": round(float(min_p), 4),
-                "VAL": round(float(min_p), 4),
-                "type": "TPO" if use_tpo else "Volume"
+                "VAH": round(float(min_p + volatility_proxy), 4),
+                "VAL": round(float(min_p - volatility_proxy), 4),
+                "HVNs": [round(float(min_p), 4)],
+                "LVNs": [round(float(min_p + 2 * volatility_proxy), 4)],
+                "type": "Simulated/Single-Point"
             }
 
         bins = np.linspace(min_p, max_p, 50)
