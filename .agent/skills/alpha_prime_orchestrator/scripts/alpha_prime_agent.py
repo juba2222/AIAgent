@@ -217,6 +217,16 @@ def generate_report(asset: str, report_type: str, provider: str, proxy: str = No
     else:
         executor = AlphaPrimeExecutor(asset, proxy=proxy)
         context_json = executor.generate_context_json()
+
+    # === 1.5 حفظ سياق JSON للمراجعة قبل الاستدعاء ===
+    context_preview_path = os.path.join(os.path.dirname(__file__), "data", "last_llm_context.json")
+    os.makedirs(os.path.dirname(context_preview_path), exist_ok=True)
+    with open(context_preview_path, "w", encoding="utf-8") as f:
+        f.write(context_json)
+
+    print(f"\n📂 [PREVIEW] تم حفظ سياق البيانات المرسل للنموذج في:")
+    print(f"   {context_preview_path}")
+    print("   (يمكنك مراجعة هذا الملف الآن قبل قراءة التقرير الاستراتيجي)")
     
     # === 2. تحضير البرومبت ===
     regime = executor.payload.get("market_regime", {})
