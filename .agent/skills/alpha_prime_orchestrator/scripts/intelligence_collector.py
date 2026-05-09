@@ -13,7 +13,9 @@ def collect_all_intelligence():
     context_json = executor.generate_context_json()
 
     # حفظ البيانات في ملف JSON
-    output_file = "alpha_prime_intelligence_db.json"
+    output_dir = os.path.join(os.path.dirname(__file__), "data")
+    os.makedirs(output_dir, exist_ok=True)
+    output_file = os.path.join(output_dir, "alpha_prime_intelligence_db.json")
     with open(output_file, "w", encoding="utf-8") as f:
         f.write(context_json)
 

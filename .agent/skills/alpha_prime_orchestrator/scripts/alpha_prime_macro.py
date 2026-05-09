@@ -32,7 +32,9 @@ class MacroAgent:
             "M2": "M2SL",
             "CPI": "CPIAUCSL",
             "Unemployment": "UNRATE",
-            "FedFunds": "FEDFUNDS"
+            "FedFunds": "FEDFUNDS",
+            "InflationExpectations": "T10YIE", # 10-Year Breakeven Inflation Rate
+            "ECBRate": "ECBASW" # ECB Rate Proxy
         }
 
         # API Keys

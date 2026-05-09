@@ -58,36 +58,47 @@ class AlphaPrimeExecutor:
         # مؤشرات (Risk/Growth)
         "SPX": "^GSPC",
         "NDX": "^NDX",
+        "DJI": "^DJI",
         "RUT": "^RUT",
+        "GER40": "^GDAXI",
+        "JPN225": "^N225",
         "MSCI_EM": "EEM",
         
         # دخل ثابت (Cost of Capital)
         "US10Y": "^TNX",
-        "US02Y": "SHY", # Proxy for 2Y (Price) or use ^IRX for 3M Yield
+        "US30Y": "^TYX",
+        "US02Y": "SHY",
         "TIPS": "TIP",
         "HY_SPREAD": "HYG",
+        "TLT": "TLT",
         
         # عملات (Liquidity)
         "DXY": "DX-Y.NYB",
         "EURUSD": "EURUSD=X",
+        "GBPUSD": "GBPUSD=X",
         "USDJPY": "JPY=X",
+        "USDCHF": "CHF=X",
+        "AUDUSD": "AUDUSD=X",
         
         # سلع (Inflation)
         "GOLD": "GC=F",
-        "OIL": "CL=F",
+        "SILVER": "SI=F",
         "COPPER": "HG=F",
+        "OIL": "CL=F",
+        "NAT_GAS": "NG=F",
         
         # تقلب (Fear)
         "VIX": "^VIX",
-        "MOVE": "IEF", # Proxy using 7-10Y Treasury (Different from TLT 20Y+)
+        "MOVE": "IEF",
         
         # رقمية (Alt Liquidity)
         "BTC": "BTC-USD",
+        "ETH": "ETH-USD",
+        "SOL": "SOL-USD",
 
         # إضافات للنسب
         "XLY": "XLY",
-        "XLP": "XLP",
-        "TLT": "TLT"
+        "XLP": "XLP"
     }
 
     def __init__(self, target_asset: str, proxy: str = None):
@@ -188,19 +199,22 @@ class AlphaPrimeExecutor:
         return session
 
     def fetch_ohlcv_data(self, ticker: str, period="1mo", interval="1h"):
-        """جلب البيانات بدقة ساعوية لضمان دقة مستويات AMT/TPO"""
+        """جلب البيانات مع نظام استعادة (Fallback) في حال فشل الدقة الساعوية"""
         try:
-            # إضافة تأخير بسيط وعشوائي (0.5 إلى 2 ثانية) لتجنب كشف البوت
-            time.sleep(random.uniform(0.5, 2.0))
+            time.sleep(random.uniform(0.3, 1.0))
+            data = yf.download(ticker, period=period, interval=interval, progress=False)
             
-            data = yf.download(
-                ticker, 
-                period=period, 
-                interval=interval, 
-                progress=False
-            )
+            if data.empty and interval == "1h":
+                print(f"⚠️ Hourly data failed for {ticker}, falling back to Daily...")
+                data = yf.download(ticker, period=period, interval="1d", progress=False)
+
             if data.empty:
                 return None
+
+            # توحيد التوقيت (Timezone naive) لضمان توافق الحسابات
+            if data.index.tz is not None:
+                data.index = data.index.tz_localize(None)
+
             return data
         except Exception as e:
             print(f"Error fetching {ticker}: {e}")
@@ -212,6 +226,11 @@ class AlphaPrimeExecutor:
         ratios = {}
 
         try:
+            # 0. DXY Correlation Check (Institutional Logic)
+            if "DXY" in ctx:
+                dxy_val = ctx["DXY"]["close"]
+                ratios["dxy_value"] = dxy_val
+                ratios["dxy_gold_impact"] = f"Inverse Pressure ({dxy_val})" if dxy_val > 104 else f"Supportive ({dxy_val})"
             # 1. منحنى العائد (Yield Curve)
             if "US10Y" in ctx and "US02Y" in ctx:
                 us10y = ctx["US10Y"]["close"]
@@ -259,7 +278,8 @@ class AlphaPrimeExecutor:
     def fetch_layer_1_technical(self):
         print("Fetching Layer 1: Technical & AMT/TPO Data...")
         asset_summary = {}
-        market_df = self.fetch_ohlcv_data("^GSPC")
+        # جلب بيانات السوق لفترة أطول لحساب البيتا بدقة
+        market_df_long = self.fetch_ohlcv_data("^GSPC", period="6mo", interval="1d")
 
         for name, ticker in self.CROSS_ASSETS.items():
             df = self.fetch_ohlcv_data(ticker)
@@ -290,10 +310,20 @@ class AlphaPrimeExecutor:
             order_flow = AMTEngine.diagnose_order_flow_patterns(target_df)
 
             # Dimension 5: Quant Metrics
-            quant_metrics = QuantEngine.get_risk_metrics(target_df, market_df)
+            # نستخدم البيانات الطويلة لحساب البيتا والبيانات اللحظية للتقلب
+            target_df_long = self.fetch_ohlcv_data(self.target_asset, period="6mo", interval="1d")
+            quant_metrics = QuantEngine.get_risk_metrics(target_df_long if target_df_long is not None else target_df, market_df_long)
+
+            # Fetch Open Interest and COT simulation
+            open_interest = "N/A"
+            if hasattr(target_df, 'Open Interest'):
+                open_interest = target_df['Open Interest'].iloc[-1]
+            elif 'Open Interest' in target_df.columns:
+                open_interest = target_df['Open Interest'].iloc[-1]
 
             self.payload["layer_1_technical"].update({
                 "close": round(float(close_val), 4),
+                "open_interest": open_interest,
                 "amt_structure": amt_data,
                 "order_flow_diagnostics": order_flow,
                 "quant_metrics": quant_metrics,
@@ -467,17 +497,25 @@ class AlphaPrimeExecutor:
 
     def fetch_layer_9_deep_insights(self):
         print(f"Fetching Layer 9: Geopolitical & Lobbying Intel (AIPAC, 13F, Congress)...")
-        intel = {}
+        intel = {
+            "aipac_and_lobbying": "N/A",
+            "congress_insider_trading": "N/A",
+            "institutional_13f_buffett": "N/A",
+            "geopolitical_tensions_europe_me": "N/A"
+        }
         if self.search_tools:
             try:
-                intel["aipac_movements"] = self.search_tools.search("Latest AIPAC lobbying activities and defense budget influence 2026")
-                intel["congress_trades_latest"] = self.search_tools.search(f"Recent congressional stock trades for {self.target_asset} and related sectors")
-                intel["institutional_13f"] = self.search_tools.search("Latest 13F filings summary for major hedge funds May 2026")
-                intel["geopolitical_events"] = self.search_tools.search("Top geopolitical events affecting global markets today")
+                intel["aipac_and_lobbying"] = self.search_tools.search("AIPAC and Western lobbying influence on defense budgets, armament, and Middle East policy 2026")
+                intel["congress_insider_trading"] = self.search_tools.search(f"Latest Congressional stock disclosures for {self.target_asset} and Gold miners using STOCK Act filings")
+                intel["institutional_13f_buffett"] = self.search_tools.search("Warren Buffett and sovereign wealth funds rotation from cash/bonds to hard assets like Gold miners 13F filings 2026")
+                intel["geopolitical_tensions_europe_me"] = self.search_tools.search("Geopolitical risk pricing in Gold: Middle East conflict and Eastern Europe escalations news today")
 
                 self.payload["layer_9_deep_insights"] = intel
-            except:
-                self.payload["layer_9_deep_insights"] = "N/A"
+            except Exception as e:
+                print(f"Search error in Layer 9: {e}")
+                self.payload["layer_9_deep_insights"] = intel
+        else:
+            self.payload["layer_9_deep_insights"] = intel
 
     def fetch_layer_10_predictions(self):
         print(f"Fetching Layer 10: Market Prediction (Kronos)...")

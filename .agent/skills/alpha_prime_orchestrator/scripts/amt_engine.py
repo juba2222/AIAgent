@@ -95,13 +95,32 @@ class AMTEngine:
         vah = max(va_prices)
         val = min(va_prices)
         
-        # Identify HVNs (top 3 peaks including POC as the first)
-        hvn_list = sorted_bins.iloc[:3]
-        hvn_prices = [round(float((idx.left + idx.right) / 2), 4) for idx in hvn_list.index]
+        # Identify HVNs (top peaks including POC)
+        # We ensure they are distinct price levels
+        hvn_prices = []
+        for idx in sorted_bins.index:
+            price = round(float((idx.left + idx.right) / 2), 4)
+            if price not in hvn_prices:
+                hvn_prices.append(price)
+            if len(hvn_prices) >= 3:
+                break
 
-        # Identify LVNs (areas with low activity within the range)
-        lvn_list = profile.sort_values(ascending=True).iloc[:3]
-        lvn_prices = [round(float((idx.left + idx.right) / 2), 4) for idx in lvn_list.index]
+        # Identify LVNs (True gaps within the trading range)
+        # Filter out bins that are part of HVNs
+        lvn_candidates = profile[profile < profile.mean() * 0.5]
+        lvn_prices = []
+        if not lvn_candidates.empty:
+            sorted_lvns = lvn_candidates.sort_values(ascending=True)
+            for idx in sorted_lvns.index:
+                price = round(float((idx.left + idx.right) / 2), 4)
+                if price not in hvn_prices and price not in lvn_prices:
+                    lvn_prices.append(price)
+                if len(lvn_prices) >= 3:
+                    break
+
+        # Fallback if no clear LVNs found
+        if not lvn_prices:
+            lvn_prices = [round(float((idx.left + idx.right) / 2), 4) for idx in profile.sort_values(ascending=True).index[:3]]
 
         # Identify Single Prints (Empty bins with 0 volume/time within the distribution)
         single_prints = [round(float((idx.left + idx.right) / 2), 4) for idx in profile[profile == 0].index]
@@ -181,6 +200,47 @@ class AMTEngine:
         return patterns
 
     @staticmethod
+    def calculate_temporal_nuances(current_day_df, prev_day_levels):
+        """
+        حساب المستويات الزمنية الحاسمة (Dimension 2):
+        - Initial Balance (IB): أول ساعة تداول.
+        - Opening Range (OR) Relationship: علاقة الافتتاح بقيمة أمس.
+        - Day Type: تشخيص نوع اليوم (Trend/Range).
+        """
+        if current_day_df.empty:
+            return {}
+
+        # 1. Initial Balance (IB) - First 1 hour of the session
+        ib_df = current_day_df.iloc[:1] # Since we use 1h data
+        if ib_df.empty:
+            return {}
+
+        ib_high = float(ib_df['High'].max())
+        ib_low = float(ib_df['Low'].min())
+
+        # 2. Opening Range Relationship
+        open_price = float(current_day_df.iloc[0]['Open'])
+        va_relationship = "Inside Value"
+        if prev_day_levels:
+            vah = prev_day_levels.get('VAH')
+            val = prev_day_levels.get('VAL')
+            if vah and val:
+                if open_price > vah: va_relationship = "Above Value (Bullish)"
+                elif open_price < val: va_relationship = "Below Value (Bearish)"
+
+        # 3. Day Type Diagnosis
+        last_close = float(current_day_df.iloc[-1]['Close'])
+        day_type = "Normal Variation / Range"
+        if last_close > ib_high: day_type = "Potential Trend Day (Up)"
+        elif last_close < ib_low: day_type = "Potential Trend Day (Down)"
+
+        return {
+            "initial_balance": {"high": ib_high, "low": ib_low, "range": round(ib_high - ib_low, 4)},
+            "opening_relationship": va_relationship,
+            "day_diagnosis": day_type
+        }
+
+    @staticmethod
     def get_timeframe_levels(df):
         """
         تقسيم البيانات وحساب المستويات لـ:
@@ -195,14 +255,20 @@ class AMTEngine:
         # تعريف الفترات
         results = {}
         
-        # 1. اليوم الحالي (آخر شمعة يومية أو بيانات اليوم)
-        results['current_day'] = AMTEngine.calculate_value_area(df[df.index.date == now.date()])
-        
-        # 2. اليوم السابق
+        # 1. اليوم السابق (نحتاجه أولاً للمقارنة)
         unique_dates = sorted(list(set(df.index.date)))
+        prev_day_levels = None
         if len(unique_dates) > 1:
             prev_date = unique_dates[-2]
-            results['previous_day'] = AMTEngine.calculate_value_area(df[df.index.date == prev_date])
+            prev_day_levels = AMTEngine.calculate_value_area(df[df.index.date == prev_date])
+            results['previous_day'] = prev_day_levels
+
+        # 2. اليوم الحالي
+        current_day_df = df[df.index.date == now.date()]
+        results['current_day'] = AMTEngine.calculate_value_area(current_day_df)
+
+        # إضافة المستويات الزمنية الحاسمة
+        results['temporal_nuances'] = AMTEngine.calculate_temporal_nuances(current_day_df, prev_day_levels)
             
         # 3. الأسبوع الحالي
         current_week_start = now - pd.Timedelta(days=now.weekday())
