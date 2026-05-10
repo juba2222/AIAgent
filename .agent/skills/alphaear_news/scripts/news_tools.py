@@ -5,8 +5,8 @@ import time
 from datetime import datetime
 from typing import List, Dict, Optional
 from loguru import logger
-from .database_manager import DatabaseManager
-from .content_extractor import ContentExtractor
+from database_manager import DatabaseManager
+from content_extractor import ContentExtractor
 
 class NewsNowTools:
     """热点新闻获取工具 - 接入 NewsNow API 与 Jina 内容提取"""

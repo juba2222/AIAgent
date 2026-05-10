@@ -17,12 +17,14 @@ from src.intelligence_layers.macro_indicators import MacroAgent
 from src.core.correlation_engine import CorrelationAgent
 
 # Path for internal skills
-SKILLS_PATH = os.path.join(os.path.dirname(__file__), "..", "..")
+# After refactor, src/core/orchestrator.py is 2 levels deep from root
+ROOT_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+SKILLS_PATH = os.path.join(ROOT_PATH, ".agent", "skills")
 if SKILLS_PATH not in sys.path:
     sys.path.append(SKILLS_PATH)
 
 # Path for Awesome-finance-skills
-AWESOME_SKILLS_PATH = os.path.join(os.path.dirname(__file__), "..", "..", "..", "Awesome-finance-skills-main", "skills")
+AWESOME_SKILLS_PATH = os.path.join(ROOT_PATH, "Awesome-finance-skills-main", "skills")
 if os.path.exists(AWESOME_SKILLS_PATH):
     sys.path.append(AWESOME_SKILLS_PATH)
 
@@ -39,13 +41,16 @@ try:
     SENTIMENT_PATH = os.path.join(AWESOME_SKILLS_PATH, "alphaear-sentiment", "scripts")
     if SENTIMENT_PATH not in sys.path: sys.path.append(SENTIMENT_PATH)
 
-    from sentiment_tools import SentimentTools
-    from database_manager import DatabaseManager as SentimentDB
+    import sentiment_tools as st
+    SentimentTools = st.SentimentTools
+    import database_manager as sdb
+    SentimentDB = sdb.DatabaseManager
 
     PREDICTOR_PATH = os.path.join(AWESOME_SKILLS_PATH, "alphaear-predictor", "scripts")
     if PREDICTOR_PATH not in sys.path: sys.path.append(PREDICTOR_PATH)
-    from kronos_predictor import KronosPredictorUtility
-except ImportError as e:
+    import kronos_predictor as kp
+    KronosPredictorUtility = kp.KronosPredictorUtility
+except Exception as e:
     print(f"Warning: Skill imports failed: {e}")
     NewsNowTools = NewsDB = SentimentTools = SentimentDB = KronosPredictorUtility = None
 
@@ -115,7 +120,8 @@ class AlphaPrimeExecutor:
             "layer_1_technical": {},
             "intelligence_ratios": {},
             "correlation_context": {},
-            "market_sentiment": {"score": 0, "label": "neutral", "catalysts": []}
+            "market_sentiment": {"score": 0, "label": "neutral", "catalysts": []},
+            "layer_10_predictions": "N/A", "layer_11_web_context": "N/A",
         }
         # Initialize Skills with safe defaults
         self.news_db = None
@@ -136,15 +142,19 @@ class AlphaPrimeExecutor:
 
             # Individual Skill Initialization
             try:
-                from alphaear_search.scripts.search_tools import SearchTools
+                SEARCH_PATH = os.path.join(SKILLS_PATH, "alphaear_search", "scripts")
+                if SEARCH_PATH not in sys.path: sys.path.append(SEARCH_PATH)
+                from search_tools import SearchTools
                 self.search_tools = SearchTools()
             except Exception as e:
                 print(f"Warning: search_tools initialization failed: {e}")
                 self.search_tools = None
 
             try:
-                from alphaear_stock.scripts.stock_tools import StockTools
-                self.stock_tools = StockTools(self.db) if hasattr(self, 'db') else StockTools(None) # Handle DB if needed
+                STOCK_PATH = os.path.join(AWESOME_SKILLS_PATH, "alphaear-stock", "scripts")
+                if STOCK_PATH not in sys.path: sys.path.append(STOCK_PATH)
+                from stock_tools import StockTools
+                self.stock_tools = StockTools(self.db) if hasattr(self, 'db') else StockTools(None)
             except Exception as e:
                 print(f"Warning: stock_tools initialization failed: {e}")
                 self.stock_tools = None
@@ -159,7 +169,7 @@ class AlphaPrimeExecutor:
                 self.predictor_tools = None
 
             try:
-                from alphaear_stock.scripts.analytics_tools import AnalyticsTools
+                from analytics_tools import AnalyticsTools
                 self.analytics_tools = AnalyticsTools()
             except Exception as e:
                 print(f"Warning: analytics_tools initialization failed: {e}")
@@ -374,22 +384,17 @@ class AlphaPrimeExecutor:
         if self.search_tools:
             try:
                 clean_ticker = self.target_asset.split('-')[0].split('=')[0].split('.')[0]
-                # OSINT Search for Congress Trades
                 q_data = self.search_tools.search(f"site:quiverquant.com OR site:housestockwatcher.com OR site:senatestockwatcher.com {clean_ticker} latest stock trades")
                 smart_money_data["congress_trades_osint"] = q_data
-
-                # 13F Intel
                 b_data = self.search_tools.search("Warren Buffett Berkshire Hathaway latest 13F filings May 2026 portfolio changes")
                 smart_money_data["buffett_13f_summary"] = b_data
-
-                # Institutional Flow (OpenBB / Search)
                 inst_data = self.search_tools.search(f"{clean_ticker} institutional ownership and dark pool activity latest news")
                 smart_money_data["institutional_flow_summary"] = inst_data
-            except:
-                pass
+            except: pass
 
         if not self.quiver_key:
             self.payload["layer_4_smart_money"] = smart_money_data
+            return
             return
 
         import requests
@@ -479,8 +484,8 @@ class AlphaPrimeExecutor:
             try:
                 g_news = self.search_tools.search("https://news.google.com/home?hl=en-US&gl=US&ceid=US:en top financial and geopolitical news today")
                 all_news.append({"title": "Google News Top Headlines", "content": g_news, "source": "Google News"})
-            except:
-                pass
+            except: pass
+
 
         # 2. AlphaEar News
         if self.news_tools:
@@ -527,7 +532,7 @@ class AlphaPrimeExecutor:
                     target_df = target_df.reset_index()
                     target_df.columns = [c.lower() for c in target_df.columns]
                     forecast = self.predictor_tools.get_base_forecast(target_df)
-                    self.payload["layer_10_predictions"] = [f.__dict__ for f in forecast]
+                    self.payload["layer_10_predictions"] = [f.__dict__ for f in forecast] if forecast else "N/A"
             except Exception as e:
                 self.payload["layer_10_predictions"] = f"Prediction failed: {e}"
 
@@ -536,8 +541,7 @@ class AlphaPrimeExecutor:
         if self.search_tools:
             try:
                 self.payload["layer_11_web_context"] = self.search_tools.search(f"Latest macro events affecting {self.target_asset} today")
-            except:
-                self.payload["layer_11_web_context"] = "N/A"
+            except: self.payload["layer_11_web_context"] = "N/A"
 
     def fetch_layer_12_signal_evolution(self):
         print(f"Fetching Layer 12: Signal Evolution Tracking...")
@@ -591,22 +595,24 @@ class AlphaPrimeExecutor:
         try:
             from src.utils.metadata_fetcher import MetadataEngine
             self.payload["asset_metadata"] = MetadataEngine.get_asset_metadata(self.target_asset)
-        except:
-            self.payload["asset_metadata"] = "N/A"
+        except: pass
 
         # Step-by-step layer ingestion
-        self.fetch_layer_1_technical() # Includes Regime Detection, Quant, AMT
+        self.fetch_layer_1_technical() # Includes Regime Detection, Quant, AMT (Dim 2, 3, 4, 5)
 
         # Dimension 9: Options & GEX
         print("Fetching Dimension 9: Options GEX Context...")
         self.payload["layer_9_options_gex"] = OptionsGexEngine.get_options_context(self.CROSS_ASSETS, self)
 
-        self.fetch_layer_2_macro()
-        self.fetch_layer_3_correlation()
-        self.fetch_layer_4_smart_money()
-        self.fetch_layer_5_liquidity_sentiment()
-        self.fetch_layer_7_mining_and_fundamental()
+        self.fetch_layer_2_macro() # Dim 1
+        self.fetch_layer_3_correlation() # Dim 6 (Intermarket)
+        self.fetch_layer_4_smart_money() # Dim 9
+
+        # MUST FETCH CATALYSTS BEFORE SENTIMENT
         self.fetch_layer_8_catalysts()
+        self.fetch_layer_5_liquidity_sentiment() # Dim 1/Sentiment
+
+        self.fetch_layer_7_mining_and_fundamental() # Dim 7
 
         # New Integrated Layers
         self.fetch_layer_9_deep_insights()

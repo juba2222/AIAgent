@@ -9,8 +9,8 @@ from typing import List, Dict, Optional, Any
 from agno.tools.duckduckgo import DuckDuckGoTools
 from agno.tools.baidusearch import BaiduSearchTools
 from datetime import datetime
-from .database_manager import DatabaseManager
-from .content_extractor import ContentExtractor
+from database_manager import DatabaseManager
+from content_extractor import ContentExtractor
 from .hybrid_search import LocalNewsSearch
 
 # 默认搜索缓存 TTL（秒），可通过环境变量覆盖
