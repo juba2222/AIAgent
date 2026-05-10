@@ -6,15 +6,15 @@ import yfinance as yf
 import pandas as pd
 import time
 import random
-from amt_engine import AMTEngine
-from regime_detector import RegimeDetector
-from quant_engine import QuantEngine
-from mining_analysis import MiningSectorAnalysis
-from options_engine import OptionsGexEngine
+from src.amt_framework.auction_analysis import AMTEngine
+from src.core.market_regimes import RegimeDetector
+from src.intelligence_layers.quant_metrics import QuantEngine
+from src.intelligence_layers.fundamental_mining import MiningSectorAnalysis
+from src.intelligence_layers.options_gex import OptionsGexEngine
 
 # Import Macro Agent and Correlation Agent
-from alpha_prime_macro import MacroAgent
-from correlation_agent import CorrelationAgent
+from src.intelligence_layers.macro_indicators import MacroAgent
+from src.core.correlation_engine import CorrelationAgent
 
 # Path for internal skills
 SKILLS_PATH = os.path.join(os.path.dirname(__file__), "..", "..")
@@ -63,15 +63,15 @@ class AlphaPrimeExecutor:
         "GER40": "^GDAXI",
         "JPN225": "^N225",
         "MSCI_EM": "EEM",
-        
+
         # دخل ثابت (Cost of Capital)
         "US10Y": "^TNX",
         "US30Y": "^TYX",
-        "US02Y": "SHY",
+        "US02Y": "^FVX", # Using 5Y Treasury Yield as a proxy for the curve calculation in yfinance context
         "TIPS": "TIP",
         "HY_SPREAD": "HYG",
         "TLT": "TLT",
-        
+
         # عملات (Liquidity)
         "DXY": "DX-Y.NYB",
         "EURUSD": "EURUSD=X",
@@ -79,18 +79,18 @@ class AlphaPrimeExecutor:
         "USDJPY": "JPY=X",
         "USDCHF": "CHF=X",
         "AUDUSD": "AUDUSD=X",
-        
+
         # سلع (Inflation)
         "GOLD": "GC=F",
         "SILVER": "SI=F",
         "COPPER": "HG=F",
         "OIL": "CL=F",
         "NAT_GAS": "NG=F",
-        
+
         # تقلب (Fear)
         "VIX": "^VIX",
         "MOVE": "IEF",
-        
+
         # رقمية (Alt Liquidity)
         "BTC": "BTC-USD",
         "ETH": "ETH-USD",
@@ -113,7 +113,7 @@ class AlphaPrimeExecutor:
             "timestamp": datetime.now().isoformat(),
             "target_asset": self.target_asset,
             "layer_1_technical": {},
-            "intelligence_ratios": {}, 
+            "intelligence_ratios": {},
             "correlation_context": {},
             "market_sentiment": {"score": 0, "label": "neutral", "catalysts": []}
         }
@@ -133,7 +133,7 @@ class AlphaPrimeExecutor:
                 self.news_tools = NewsNowTools(self.news_db)
             if SentimentDB and SentimentTools:
                 self.sentiment_tools = SentimentTools(self.sent_db)
-            
+
             # Individual Skill Initialization
             try:
                 from alphaear_search.scripts.search_tools import SearchTools
@@ -166,16 +166,16 @@ class AlphaPrimeExecutor:
                 self.analytics_tools = None
 
             try:
-                from openbb_agent import OpenBBAgent
+                from src.utils.openbb_connector import OpenBBAgent
                 self.openbb_agent = OpenBBAgent()
             except Exception as e:
                 print(f"Warning: openbb_agent initialization failed: {e}")
                 self.openbb_agent = None
-                
+
         except Exception as e:
             print(f"Warning: Core skill initialization failed: {e}")
             self.analytics_tools = None
-            
+
         # Quiver API Key
         self.quiver_key = os.getenv("QUIVER_API_KEY")
 
@@ -185,17 +185,17 @@ class AlphaPrimeExecutor:
         # Fallback to requests if yf session logic is not available
         import requests
         session = requests.Session()
-        
+
         user_agents = [
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
             "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36",
             "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
         ]
         session.headers.update({"User-Agent": random.choice(user_agents)})
-        
+
         if self.proxy:
             session.proxies = {"http": self.proxy, "https": self.proxy}
-            
+
         return session
 
     def fetch_ohlcv_data(self, ticker: str, period="1mo", interval="1h"):
@@ -203,7 +203,7 @@ class AlphaPrimeExecutor:
         try:
             time.sleep(random.uniform(0.3, 1.0))
             data = yf.download(ticker, period=period, interval=interval, progress=False)
-            
+
             if data.empty and interval == "1h":
                 print(f"⚠️ Hourly data failed for {ticker}, falling back to Daily...")
                 data = yf.download(ticker, period=period, interval="1d", progress=False)
@@ -243,19 +243,19 @@ class AlphaPrimeExecutor:
                     ratios["yield_curve_status"] = f"Flat ({spread:.2f}) - ضغط سيولة"
                 else:
                     ratios["yield_curve_status"] = f"Normal ({spread:.2f}) - نمو"
-            
+
             # 2. النحاس إلى الذهب (Copper / Gold)
             if "COPPER" in ctx and "GOLD" in ctx:
                 ratios["copper_gold_ratio"] = round(ctx["COPPER"]["close"] / ctx["GOLD"]["close"], 6)
-            
+
             # 3. الفارق الائتماني (Credit Spread Proxy: HYG / TLT)
             if "HY_SPREAD" in ctx and "TLT" in ctx:
                 ratios["credit_stress_ratio"] = round(ctx["HY_SPREAD"]["close"] / ctx["TLT"]["close"], 4)
-            
+
             # 4. الكماليات مقابل الأساسيات (XLY / XLP)
             if "XLY" in ctx and "XLP" in ctx:
                 ratios["consumer_strength_ratio"] = round(ctx["XLY"]["close"] / ctx["XLP"]["close"], 4)
-            
+
             # 5. تركز السيولة (NDX / RUT)
             if "NDX" in ctx and "RUT" in ctx:
                 ratios["liquidity_concentration_ratio"] = round(ctx["NDX"]["close"] / ctx["RUT"]["close"], 4)
@@ -286,24 +286,24 @@ class AlphaPrimeExecutor:
             if df is not None:
                 close_val = df['Close'].iloc[-1]
                 if isinstance(close_val, (pd.Series, pd.DataFrame)): close_val = close_val.iloc[0]
-                
+
                 asset_summary[name] = {
                     "close": round(float(close_val), 4),
                     "AMT_Temporal_Levels": AMTEngine.get_timeframe_levels(df)
                 }
-        
+
         self.payload["correlation_context"] = asset_summary
         self.calculate_intelligence_ratios()
-        
+
         print("Running Regime Detection Engine...")
         regime_result = RegimeDetector.detect(self.payload["intelligence_ratios"], self.payload["correlation_context"])
         self.payload["market_regime"] = regime_result
-        
+
         target_df = self.fetch_ohlcv_data(self.target_asset)
         if target_df is not None:
             close_val = target_df['Close'].iloc[-1]
             if isinstance(close_val, (pd.Series, pd.DataFrame)): close_val = close_val.iloc[0]
-            
+
             # Dimension 2 & 3: AMT/TPO
             use_tpo = 'Volume' not in target_df.columns or target_df['Volume'].sum() == 0
             amt_data = AMTEngine.calculate_value_area(target_df, use_tpo=use_tpo)
@@ -395,19 +395,19 @@ class AlphaPrimeExecutor:
         import requests
         headers = {"Authorization": f"Bearer {self.quiver_key}", "Accept": "application/json"}
         base_url = "https://api.quiverquant.com/beta"
-        
+
         # We strip suffixes for Quiver (e.g., NVDA instead of NVDA.MX)
         clean_ticker = self.target_asset.split('-')[0].split('=')[0].split('.')[0]
-        
+
         smart_money_data = {}
-        
+
         try:
             # 1. Congress Trading
             congress_url = f"{base_url}/live/congresstrading/{clean_ticker}"
             c_resp = requests.get(congress_url, headers=headers, timeout=10)
             if c_resp.status_code == 200:
                 smart_money_data["congress_trades"] = c_resp.json()[:5] # Top 5 recent
-            
+
             # 2. Insider Trading
             insider_url = f"{base_url}/live/insiders/{clean_ticker}"
             i_resp = requests.get(insider_url, headers=headers, timeout=10)
@@ -561,7 +561,7 @@ class AlphaPrimeExecutor:
             is_equity = self.payload.get("asset_metadata", {}).get("type") == "Equity"
 
             if is_equity:
-                from analytics_engine import AnalyticsEngine
+                from src.utils.toolkit_analytics import AnalyticsEngine
                 ae = AnalyticsEngine()
                 clean_ticker = self.target_asset.split('-')[0].split('=')[0].split('.')[0]
                 self.payload["layer_14_toolkit_analytics"] = ae.get_full_analysis(clean_ticker)
@@ -589,7 +589,7 @@ class AlphaPrimeExecutor:
         # Asset Metadata (FinanceDatabase)
         print("Fetching Asset Metadata (FinanceDatabase)...")
         try:
-            from metadata_engine import MetadataEngine
+            from src.utils.metadata_fetcher import MetadataEngine
             self.payload["asset_metadata"] = MetadataEngine.get_asset_metadata(self.target_asset)
         except:
             self.payload["asset_metadata"] = "N/A"
@@ -607,7 +607,7 @@ class AlphaPrimeExecutor:
         self.fetch_layer_5_liquidity_sentiment()
         self.fetch_layer_7_mining_and_fundamental()
         self.fetch_layer_8_catalysts()
-        
+
         # New Integrated Layers
         self.fetch_layer_9_deep_insights()
         self.fetch_layer_10_predictions()
@@ -615,7 +615,7 @@ class AlphaPrimeExecutor:
         self.fetch_layer_12_signal_evolution()
         self.fetch_layer_13_institutional()
         self.fetch_layer_14_toolkit_analytics()
-        
+
         self.payload["layer_6_alt_data"] = "Integrated via Smart Money/Logistics/OpenBB/FinanceToolkit"
 
         # Pre-process payload to ensure all keys are strings and handle datetime values

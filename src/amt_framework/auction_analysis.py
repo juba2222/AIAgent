@@ -17,7 +17,7 @@ class AMTEngine:
             return None
 
         df = df.copy()
-        
+
         if 'Close' in df.columns:
             close_series = df['Close']
             if isinstance(close_series, pd.DataFrame):
@@ -27,10 +27,10 @@ class AMTEngine:
 
         min_p = close_series.min()
         max_p = close_series.max()
-        
+
         if hasattr(min_p, 'item'): min_p = min_p.item()
         if hasattr(max_p, 'item'): max_p = max_p.item()
-        
+
         if float(min_p) == float(max_p):
             # محاكاة التوزيع في حال توفر نقطة سعرية واحدة (للمحافظة على منطق المزاد)
             volatility_proxy = float(min_p) * 0.001 # 0.1% Range estimation
@@ -45,7 +45,7 @@ class AMTEngine:
 
         bins = np.linspace(min_p, max_p, 50)
         df.loc[:, 'bin'] = pd.cut(close_series, bins=bins)
-        
+
         # Ensure use_tpo is a boolean
         if isinstance(use_tpo, (pd.Series, pd.DataFrame)):
             use_tpo = use_tpo.any()
@@ -66,35 +66,35 @@ class AMTEngine:
                 volume_series = volume_series.iloc[:, 0]
             profile = df.groupby('bin', observed=True).apply(lambda x: volume_series.loc[x.index].sum())
             profile_type = "Volume"
-        
+
         if profile.empty or profile.sum() == 0:
             return None
 
         poc_bin = profile.idxmax()
         poc = (poc_bin.left + poc_bin.right) / 2
-        
+
         total_metric = profile.sum()
         target_va_metric = total_metric * value_area_pct
-        
+
         sorted_bins = profile.sort_values(ascending=False)
-        
+
         cumulative_m = 0
         va_bins = []
-        
+
         for idx, val in sorted_bins.items():
             cumulative_m += val
             va_bins.append(idx)
             if cumulative_m >= target_va_metric:
                 break
-        
+
         va_prices = []
         for b in va_bins:
             va_prices.append(b.left)
             va_prices.append(b.right)
-            
+
         vah = max(va_prices)
         val = min(va_prices)
-        
+
         # Identify HVNs (top peaks including POC)
         # We ensure they are distinct price levels
         hvn_prices = []
@@ -125,6 +125,7 @@ class AMTEngine:
         # Identify Single Prints (Empty bins with 0 volume/time within the distribution)
         single_prints = [round(float((idx.left + idx.right) / 2), 4) for idx in profile[profile == 0].index]
 
+        last_price = float(close_series.iloc[-1])
         return {
             "POC": round(float(poc), 4),
             "VAH": round(float(vah), 4),
@@ -132,14 +133,14 @@ class AMTEngine:
             "HVNs": hvn_prices,
             "LVNs": lvn_prices,
             "single_prints": single_prints[:5], # Top 5 voids
-            "profile_shape": AMTEngine._detect_profile_shape(profile, poc_bin),
+            "profile_shape": AMTEngine._detect_profile_shape(profile, poc_bin, last_price),
             "type": profile_type
         }
 
     @staticmethod
-    def _detect_profile_shape(profile, poc_bin):
+    def _detect_profile_shape(profile, poc_bin, last_price=None):
         """
-        تحديد شكل البروفايل (P, b, D).
+        تحديد شكل البروفايل (P, b, D) مع تحليل سلوكي للإغلاق.
         P-shape: POC in upper half (Short covering)
         b-shape: POC in lower half (Long liquidation)
         D-shape: POC in middle (Balanced)
@@ -149,12 +150,28 @@ class AMTEngine:
             poc_idx = bins.index(poc_bin)
             total_bins = len(bins)
 
+            base_shape = ""
             if poc_idx > total_bins * 0.6:
-                return "P-Shape (Bullish/Short Covering)"
+                base_shape = "P-Shape (Bullish/Short Covering)"
             elif poc_idx < total_bins * 0.4:
-                return "b-Shape (Bearish/Long Liquidation)"
+                base_shape = "b-Shape (Bearish/Long Liquidation)"
             else:
-                return "D-Shape (Balanced)"
+                base_shape = "D-Shape (Balanced)"
+
+            # Behavioral nuance based on close (Late Rally/Rejection)
+            if last_price is not None:
+                min_p = bins[0].left
+                max_p = bins[-1].right
+                price_range = max_p - min_p
+                if price_range > 0:
+                    relative_close = (last_price - min_p) / price_range
+
+                    if "b-Shape" in base_shape and relative_close > 0.8:
+                        return f"{base_shape} - [Behavioral Nuance: Late Rally Detected]"
+                    if "P-Shape" in base_shape and relative_close < 0.2:
+                        return f"{base_shape} - [Behavioral Nuance: Late Rejection Detected]"
+
+            return base_shape
         except:
             return "Indeterminate"
 
@@ -251,10 +268,10 @@ class AMTEngine:
             return {}
 
         now = df.index[-1]
-        
+
         # تعريف الفترات
         results = {}
-        
+
         # 1. اليوم السابق (نحتاجه أولاً للمقارنة)
         unique_dates = sorted(list(set(df.index.date)))
         prev_day_levels = None
@@ -269,28 +286,28 @@ class AMTEngine:
 
         # إضافة المستويات الزمنية الحاسمة
         results['temporal_nuances'] = AMTEngine.calculate_temporal_nuances(current_day_df, prev_day_levels)
-            
+
         # 3. الأسبوع الحالي
         current_week_start = now - pd.Timedelta(days=now.weekday())
         results['current_week'] = AMTEngine.calculate_value_area(df[df.index >= current_week_start.normalize()])
-        
+
         # 4. الأسبوع السابق
         prev_week_start = current_week_start - pd.Timedelta(days=7)
         results['previous_week'] = AMTEngine.calculate_value_area(
             df[(df.index >= prev_week_start.normalize()) & (df.index < current_week_start.normalize())]
         )
-        
+
         # 5. الشهر الحالي
         current_month_start = now.replace(day=1)
         results['current_month'] = AMTEngine.calculate_value_area(df[df.index >= current_month_start.normalize()])
-        
+
         # 6. الشهر السابق
         prev_month_end = current_month_start - pd.Timedelta(days=1)
         prev_month_start = prev_month_end.replace(day=1)
         results['previous_month'] = AMTEngine.calculate_value_area(
             df[(df.index >= prev_month_start.normalize()) & (df.index < current_month_start.normalize())]
         )
-        
+
         return results
 
     @staticmethod

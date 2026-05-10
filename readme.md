@@ -1,6 +1,6 @@
 # 🤖 Alpha Prime: Senior Macro Algo-Strategist
 
-وكيل ذكاء اصطناعي فائق التطور يعالج **14 طبقة** من البيانات الاستخباراتية (من مؤشرات الماكرو إلى التنبؤات العصبية) لإنتاج تقارير تداول مؤسساتية قائمة على **الإطار الديناميكي للارتباطات**، نظرية المزاد (AMT)، وتتبع السيولة الذكية.
+Alpha Prime is a high-fidelity intelligence system that processes **14 layers** of financial data into **9 strategic dimensions** (The Nonary Model). It bridges the gap between raw market data and institutional-grade strategic reporting.
 
 ---
 
@@ -60,17 +60,16 @@ $env:GEMINI_API_KEY="your-key-here"
 pip install -r requirements.txt
 ```
 
-### 2. تشغيل التحليل التساعي للذهب (Dimension 9 Analysis)
-تم تحديث الوكيل ليدعم **النموذج التساعي الشامل** المخصص للذهب والأسواق الكبرى:
-```powershell
-# تحليل الذهب (XAU=F) باستخدام الأبعاد التسعة
-python .agent/skills/alpha_prime_orchestrator/scripts/alpha_prime_agent.py --asset XAU=F --report full
+### 2. Running the Nonary Gold Analysis
+The system is optimized for Gold (GC=F) and major macro assets:
+```bash
+# Analyze Gold using the local database
+python src/core/agent.py --asset GC=F --report full --db
 ```
 
-### 3. تحليل أي أصل مالي آخر
-```powershell
-# مثال لتحليل سهم NVDA أو البيتكوين
-python .agent/skills/alpha_prime_orchestrator/scripts/alpha_prime_agent.py --asset NVDA --report both
+### 3. Quick Start Example
+```bash
+python examples/quick_start.py
 ```
 
 ---

@@ -14,7 +14,7 @@ import sys
 import argparse
 from datetime import datetime
 
-from alpha_prime_executor import AlphaPrimeExecutor
+from src.core.orchestrator import AlphaPrimeExecutor
 
 # إضافة مسارات المهارات للاستيراد
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", "..", "alphaear_discovery", "scripts"))
@@ -204,7 +204,7 @@ def generate_report(asset: str, report_type: str, provider: str, proxy: str = No
     print("=" * 60)
     
     # البحث عن قاعدة البيانات في الجذر أولاً ثم في مجلد البيانات
-    root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", ".."))
+    root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
     db_path = os.path.join(root_dir, "alpha_prime_intelligence_db.json")
 
     if not os.path.exists(db_path):
@@ -229,7 +229,7 @@ def generate_report(asset: str, report_type: str, provider: str, proxy: str = No
     os.makedirs(output_dir, exist_ok=True)
 
     # نسخة ثابتة للمراجعة السريعة (في الجذر لسهولة الوصول)
-    root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", ".."))
+    root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
     context_preview_path = os.path.join(root_dir, "last_llm_context.json")
     with open(context_preview_path, "w", encoding="utf-8") as f:
         f.write(context_json)
