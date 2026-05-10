@@ -218,15 +218,25 @@ def generate_report(asset: str, report_type: str, provider: str, proxy: str = No
         executor = AlphaPrimeExecutor(asset, proxy=proxy)
         context_json = executor.generate_context_json()
 
-    # === 1.5 حفظ سياق JSON للمراجعة قبل الاستدعاء ===
-    context_preview_path = os.path.join(os.path.dirname(__file__), "data", "last_llm_context.json")
-    os.makedirs(os.path.dirname(context_preview_path), exist_ok=True)
+    # === 1.5 حفظ سياق JSON للمراجعة قبل الاستدعاء (نسخة أخيرة + أرشيف مؤرخ) ===
+    output_dir = os.path.join(os.path.dirname(__file__), "data")
+    os.makedirs(output_dir, exist_ok=True)
+
+    # نسخة ثابتة للمراجعة السريعة
+    context_preview_path = os.path.join(output_dir, "last_llm_context.json")
     with open(context_preview_path, "w", encoding="utf-8") as f:
         f.write(context_json)
 
+    # نسخة مؤرشفة بالتوقيت
+    req_timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    archive_context_path = os.path.join(output_dir, f"llm_context_{asset}_{req_timestamp}.json")
+    with open(archive_context_path, "w", encoding="utf-8") as f:
+        f.write(context_json)
+
     print(f"\n📂 [PREVIEW] تم حفظ سياق البيانات المرسل للنموذج في:")
-    print(f"   {context_preview_path}")
-    print("   (يمكنك مراجعة هذا الملف الآن قبل قراءة التقرير الاستراتيجي)")
+    print(f"   🚩 النسخة الأخيرة: {context_preview_path}")
+    print(f"   📁 نسخة الأرشيف:  {archive_context_path}")
+    print("   (يمكنك مراجعة هذه الملفات الآن قبل قراءة التقرير الاستراتيجي)")
     
     # === 2. تحضير البرومبت ===
     regime = executor.payload.get("market_regime", {})
