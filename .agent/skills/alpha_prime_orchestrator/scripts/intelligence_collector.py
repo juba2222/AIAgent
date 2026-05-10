@@ -12,12 +12,13 @@ def collect_all_intelligence():
     executor = AlphaPrimeExecutor("XAU=F")
     context_json = executor.generate_context_json()
 
-    # حفظ البيانات في ملف JSON (النسخة الموحدة + نسخة مؤرخة)
+    # حفظ البيانات في ملف JSON (النسخة الموحدة في الجذر + نسخة مؤرخة في data)
     output_dir = os.path.join(os.path.dirname(__file__), "data")
     os.makedirs(output_dir, exist_ok=True)
 
-    # 1. النسخة الموحدة (للاستخدام البرمجي)
-    master_file = os.path.join(output_dir, "alpha_prime_intelligence_db.json")
+    # 1. النسخة الموحدة (في جذر المشروع لسهولة الوصول والمراجعة)
+    root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", ".."))
+    master_file = os.path.join(root_dir, "alpha_prime_intelligence_db.json")
     with open(master_file, "w", encoding="utf-8") as f:
         f.write(context_json)
 

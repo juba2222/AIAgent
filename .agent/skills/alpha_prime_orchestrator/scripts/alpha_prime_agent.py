@@ -203,7 +203,13 @@ def generate_report(asset: str, report_type: str, provider: str, proxy: str = No
     if proxy: print(f"   Proxy: {proxy}")
     print("=" * 60)
     
-    db_path = os.path.join(os.path.dirname(__file__), "data", "alpha_prime_intelligence_db.json")
+    # البحث عن قاعدة البيانات في الجذر أولاً ثم في مجلد البيانات
+    root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", ".."))
+    db_path = os.path.join(root_dir, "alpha_prime_intelligence_db.json")
+
+    if not os.path.exists(db_path):
+        db_path = os.path.join(os.path.dirname(__file__), "data", "alpha_prime_intelligence_db.json")
+
     if use_db and os.path.exists(db_path):
         print(f"📂 تحميل البيانات من قاعدة البيانات المحلية ({db_path})...")
         with open(db_path, "r", encoding="utf-8") as f:
@@ -222,8 +228,9 @@ def generate_report(asset: str, report_type: str, provider: str, proxy: str = No
     output_dir = os.path.join(os.path.dirname(__file__), "data")
     os.makedirs(output_dir, exist_ok=True)
 
-    # نسخة ثابتة للمراجعة السريعة
-    context_preview_path = os.path.join(output_dir, "last_llm_context.json")
+    # نسخة ثابتة للمراجعة السريعة (في الجذر لسهولة الوصول)
+    root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", ".."))
+    context_preview_path = os.path.join(root_dir, "last_llm_context.json")
     with open(context_preview_path, "w", encoding="utf-8") as f:
         f.write(context_json)
 
