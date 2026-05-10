@@ -9,9 +9,9 @@ from typing import List, Dict, Optional, Any
 from agno.tools.duckduckgo import DuckDuckGoTools
 from agno.tools.baidusearch import BaiduSearchTools
 from datetime import datetime
-from .database_manager import DatabaseManager
-from .content_extractor import ContentExtractor
-from .hybrid_search import LocalNewsSearch
+from database_manager import DatabaseManager
+from content_extractor import ContentExtractor
+from hybrid_search import LocalNewsSearch
 
 # 默认搜索缓存 TTL（秒），可通过环境变量覆盖
 DEFAULT_SEARCH_TTL = int(os.getenv("SEARCH_CACHE_TTL", "3600"))  # 默认 1 小时

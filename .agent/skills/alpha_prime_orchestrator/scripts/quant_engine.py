@@ -42,15 +42,17 @@ class QuantEngine:
         """
         # محاذاة البيانات
         combined = pd.concat([asset_returns, market_returns], axis=1).dropna()
-        if len(combined) < 20:
-            return 1.0
+        if len(combined) < 10:
+            return 0.0 # Return 0 instead of 1.0 default for better transparency
 
         combined.columns = ['asset', 'market']
 
-        X = add_constant(combined['market'])
-        model = OLS(combined['asset'], X).fit()
-
-        return float(model.params['market'])
+        try:
+            X = add_constant(combined['market'])
+            model = OLS(combined['asset'], X).fit()
+            return float(model.params['market'])
+        except:
+            return 0.0
 
     @staticmethod
     def get_risk_metrics(asset_df, market_df=None):

@@ -36,53 +36,63 @@ SYSTEM_PROMPT = """
 
 المبدأ الأساسي: الارتباطات ليست ثوابت رياضية، بل ديناميكيات متغيرة تتأثر بنظام السوق (Market Regime) ونوع الصدمة ومستوى التضخم وحالة السيولة.
 
-### القواعد الذهبية للتحليل التساعي (Dimension 9 System):
-1. البعد الجيوسياسي: الذهب يسعر "نية الصراع" قبل وقوعه. راقب ميزانيات التسليح، تحركات اللوبيات (مثل AIPAC)، والقرارات السيادية.
-2. فك الارتباط الهيكلي: الذهب والدولار معاً في صعود → تحوط نظامي عميق.
-3. تتبع الأموال الذكية: راقب 13F (وارن بافيت)، وتداولات الكونجرس، وتمركزات الماركت ميكر (GEX).
-4. هيكل المزاد (AMT/TPO): السوق يسهل التجارة. ابحث عن القيمة العادلة، الـ LVN مناطق رفض، والـ HVN مناطق قبول.
-5. المراجحة والمناجم: قارن أداء الذهب بأسهم التعدين (NEM, GOLD) ونماذج DuPont/Piotroski لكشف الانحرافات.
-6. التقلب والسيولة: انفجارات التقلب (EWMA) وفراغات السيولة (Single Prints) هي خرائط الطريق للأهداف الكبرى.
+### القواعد الذهبية للنظام التساعي (Nonary Analysis System):
+أنت تدمج 14 طبقة من الاستخبارات المالية في 9 أبعاد استراتيجية:
+1. البعد الجيوسياسي واللوبيات: الذهب يسعر "نية الصراع" قبل وقوعه. راقب ميزانيات التسليح، تحركات اللوبيات (مثل AIPAC)، والقرارات السيادية.
+2. فك الارتباط الهيكلي: الذهب والدولار معاً في صعود → تحوط نظامي عميق ضد انهيار العملات الورقية.
+3. تتبع الأموال الذكية (Smart Money): راقب 13F (وارن بافيت)، وتداولات أعضاء الكونجرس، وتمركزات الماركت ميكر (GEX)، وتقارير COT للفيوتشرز، والـ Dark Pools.
+4. هيكل المزاد (AMT/TPO): ابحث عن القيمة العادلة (POC/VAH/VAL). الـ LVN مناطق رفض (بالون)، والـ HVN مناطق قبول (مغناطيس). راقب "One-timeframing" لتأكيد سيطرة طرف واحد. عند المقارنة بين الأصول، انتبه لنوع البروفايل (Volume vs TPO)؛ بروفايل الحجم يعكس تمركز الأموال الحقيقي، بينما بروفايل الوقت (TPO) يعكس قبول السعر زمنياً. التوافق بين النوعين يعطي إشارة عالية اليقين.
+5. المراجحة والمناجم: قارن أداء الذهب بأسهم التعدين ونماذج DuPont/Piotroski لكشف انحرافات الـ Alpha.
+6. التقلب والسيولة: انفجارات التقلب (GARCH/EWMA) وفراغات السيولة (Single Prints) هي خرائط الطريق للأهداف الكبرى.
+7. الدورة الاقتصادية والسيولة (Macro Context): تتبع الفائدة الحقيقية (TIPS)، منحنى العائد، ونمو المعروض النقدي (M2).
+8. الارتباطات الديناميكية: راقب تحركات MOVE (تقلب السندات) مقابل TLT والذهب.
+9. التنبؤ الخوارزمي: دمج نماذج السلاسل الزمنية العصبية مع مستويات السيولة لتحديد الأهداف.
 
 ### الأسلوب الكتابي:
 - لغة عربية تقنية مؤسساتية (Strategic & Institutional Tone).
-- استخدام جداول واضحة للمستويات الهيكلية والنسب.
-- ربط الأسباب بالنتائج (Logic Chains).
-- الاعتماد الكلي على بيانات JSON المرفقة.
+- استخدام جداول واضحة وشاملة للمستويات الهيكلية والنسب المحورية.
+- بناء "سلاسل منطقية" (Logic Chains) تربط بين البيانات الاستخباراتية والنتائج التكتيكية.
+- الاعتماد الكلي على بيانات JSON المرفقة التي تغطي كافة الأصول الأساسية والنسب.
 """
 
 ANALYTICAL_REPORT_INSTRUCTIONS = """
 أصدر "التقرير التحليلي الاستراتيجي التساعي" (Strategic Nonary Intelligence Report) بالهيكلية التالية:
 
-## 1. فلسفة المزاد والسياق الهيكلي (Auction Philosophy & Structural Context)
-شرح لحالة السوق الحالية (توازن vs اكتشاف السعر) واستخدام جداول لتوضيح مستويات القيمة (VAH, VAL, POC) للأصل المستهدف.
+## 1. الملخص الاستخباراتي التنفيذي (Executive Intel Summary)
+توصيف "نظام السوق" الحالي (Market Regime) ودرجة اليقين (Confidence Score).
 
-## 2. تحليل مزاد الأصل المستهدف (Target Asset Auction Analysis)
-تشريح دقيق للجلسة الحالية مقابل الأسابيع السابقة. حدد أنماط One-timeframing وشكل البروفايل (P, b, D). اذكر الأرقام بدقة في جداول.
+## 2. مصفوفة مستويات المزاد (Multi-Timeframe AMT Matrix)
+جدول شامل يعرض مستويات POC, VAH, VAL للأصل المستهدف للفترات:
+- اليوم الحالي (CD) واليوم السابق (PD)
+- الأسبوع الحالي (CW) والأسبوع السابق (PW)
+- الشهر الحالي (CM) والشهر السابق (PM)
+تحليل شكل البروفايل (P/b/D) وحالة التوازن.
 
-## 3. تدفقات السيولة والأموال الذكية (Institutional Flow & Smart Money)
-تحليل سلوك المؤسسات vs التجزئة. دمج تداولات الكونجرس، تحركات كبار المستثمرين (بافيت)، والـ Dark Pools.
+## 3. تدفقات السيولة والأموال الذكية (Smart Money & Institutional Flow)
+تحليل تداولات الكونجرس، تحركات الحيتان (Buffett/13F)، وبيانات الـ Dark Pools والـ COT (إذا توفرت).
 
 ## 4. إدارة المخاطر والمقاييس الكمية (Risk & Quant Metrics)
-عرض نماذج التقلب (EWMA)، القيمة المعرضة للخطر (VaR)، ونسب بيتا. استخدم جداول للمقارنة.
+جدول يوضح: EWMA Volatility, VaR (95%), Beta, و Risk/Reward Ratio.
 
-## 5. التحليل التقاطعي والنسب المحورية (Intermarket & Ratios)
-تحليل نسب (ذهب/فضة)، (ذهب/أسهم)، وعلاقة الأصل بالدولار والعوائد الحقيقية.
+## 5. التحليل التقاطعي والنسب المحورية (Intermarket Matrix)
+تحليل العلاقات بين الذهب، الدولار، السندات (MOVE/TLT)، والأسهم.
+جدول النسب: (Gold/Silver), (Gold/S&P), (Copper/Gold), (Yield Curve Spread).
 
-## 6. التحليل الأساسي ونماذج التعدين/الشركات (Fundamental & Mining Logic)
-نتائج Piotroski F-Score و DuPont للشركات المرتبطة وكشف فرص المراجحة.
+## 6. التحليل الأساسي وهيكلة الـ Alpha (Fundamental & Mining Logic)
+نتائج Piotroski F-Score و DuPont لشركات التعدين الكبرى (NEM, GOLD) وفرص المراجحة.
 
-## 7. سوق الخيارات وديناميكيات "غاما" (Options & Gamma Dynamics - GEX)
-تحليل مستويات GEX، نقطة Gamma Flip، وحوائط العقود (Call/Put Walls).
+## 7. ديناميكيات "غاما" والخيارات (Options GEX Context)
+تحديد مستويات Gamma Flip وحوائط العقود Call/Put Walls التي تعمل كمغناطيس أو جدران صد.
 
 ## 8. البعد التاسع: الجيوسياسة واللوبيات (Geopolitical & Lobbying Intel)
-تأثير ميزانيات التسليح، اللوبيات، والقرارات الدولية على علاوة المخاطر.
+تحليل تأثير اللوبيات (AIPAC)، قرارات الإنفاق العسكري، والتوترات الجيوسياسية المكتشفة من الأخبار.
 
-## 9. الاستنتاجات التكتيكية والاستراتيجية (Strategic Synthesis)
-بناء سيناريوهات If/Then نهائية وقرارات عالية الاحتمالية.
+## 9. التجميع الاستراتيجي والسيناريوهات (Strategic Synthesis)
+بناء سلاسل منطقية (Logic Chains): "بما أن [بيان]، إذن [توقع]، بشرط [شرط]".
+سيناريوهات If/Then واضحة للتنفيذ.
 
-## مخطط المنطق البصري (Mermaid)
-مخطط Mermaid يشرح تسلسل الأسباب والنتائج.
+## مخطط المنطق البصري (Visual Logic - Mermaid)
+مخطط Mermaid يشرح تدفق القرار الاستراتيجي.
 """
 
 EXECUTION_REPORT_INSTRUCTIONS = """
@@ -152,7 +162,7 @@ def call_openai(system_prompt: str, user_prompt: str, api_key: str) -> str:
     return response.choices[0].message.content
 
 
-def generate_report(asset: str, report_type: str, provider: str, proxy: str = None) -> str:
+def generate_report(asset: str, report_type: str, provider: str, proxy: str = None, use_db: bool = False) -> str:
     """
     المسار الكامل: جلب البيانات → كشف النظام → توليد التقرير.
     """
@@ -193,8 +203,40 @@ def generate_report(asset: str, report_type: str, provider: str, proxy: str = No
     if proxy: print(f"   Proxy: {proxy}")
     print("=" * 60)
     
-    executor = AlphaPrimeExecutor(asset, proxy=proxy)
-    context_json = executor.generate_context_json()
+    db_path = os.path.join(os.path.dirname(__file__), "data", "alpha_prime_intelligence_db.json")
+    if use_db and os.path.exists(db_path):
+        print(f"📂 تحميل البيانات من قاعدة البيانات المحلية ({db_path})...")
+        with open(db_path, "r", encoding="utf-8") as f:
+            full_db = json.load(f)
+            # Use data from DB if it matches the target asset, otherwise fetch fresh for specific asset context
+            # However, the DB generated by intelligence_collector already contains a comprehensive snapshot.
+            context_json = json.dumps(full_db, indent=4, ensure_ascii=False)
+            # Create a dummy executor to handle the logic below, or better, re-parse the data
+            executor = AlphaPrimeExecutor(asset, proxy=proxy)
+            executor.payload = full_db
+    else:
+        executor = AlphaPrimeExecutor(asset, proxy=proxy)
+        context_json = executor.generate_context_json()
+
+    # === 1.5 حفظ سياق JSON للمراجعة قبل الاستدعاء (نسخة أخيرة + أرشيف مؤرخ) ===
+    output_dir = os.path.join(os.path.dirname(__file__), "data")
+    os.makedirs(output_dir, exist_ok=True)
+
+    # نسخة ثابتة للمراجعة السريعة
+    context_preview_path = os.path.join(output_dir, "last_llm_context.json")
+    with open(context_preview_path, "w", encoding="utf-8") as f:
+        f.write(context_json)
+
+    # نسخة مؤرشفة بالتوقيت
+    req_timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    archive_context_path = os.path.join(output_dir, f"llm_context_{asset}_{req_timestamp}.json")
+    with open(archive_context_path, "w", encoding="utf-8") as f:
+        f.write(context_json)
+
+    print(f"\n📂 [PREVIEW] تم حفظ سياق البيانات المرسل للنموذج في:")
+    print(f"   🚩 النسخة الأخيرة: {context_preview_path}")
+    print(f"   📁 نسخة الأرشيف:  {archive_context_path}")
+    print("   (يمكنك مراجعة هذه الملفات الآن قبل قراءة التقرير الاستراتيجي)")
     
     # === 2. تحضير البرومبت ===
     regime = executor.payload.get("market_regime", {})
@@ -229,6 +271,11 @@ def generate_report(asset: str, report_type: str, provider: str, proxy: str = No
             return None
         
         print("\n🧠 إرسال البيانات إلى Gemini...")
+        # التحقق من تركز السيولة لإضافة تحذير خاص
+        concentration = executor.payload.get("intelligence_ratios", {}).get("liquidity_concentration_ratio", 0)
+        if isinstance(concentration, (int, float)) and concentration > 10.0:
+            user_prompt = f"🚨 تنبيه نظام: تركز السيولة مرتفع جداً ({concentration:.2f}) - حذر من انزلاق سعري حاد.\n\n" + user_prompt
+
         report = call_gemini(SYSTEM_PROMPT, user_prompt, api_key)
         
     elif provider == "openai":
@@ -291,6 +338,8 @@ def main():
                         help="HTTP/HTTPS Proxy (e.g., http://user:pass@host:port)")
     parser.add_argument("--discovery", action="store_true",
                         help="تفعيل وضع الاستكشاف الآلي بناءً على إشارات DeepEar")
+    parser.add_argument("--db", action="store_true",
+                        help="استخدام قاعدة البيانات المحلية alpha_prime_intelligence_db.json بدلاً من جلب بيانات جديدة")
     
     args = parser.parse_args()
     
@@ -298,7 +347,7 @@ def main():
     if args.discovery:
         target_asset = "DISCOVERY"
         
-    generate_report(target_asset, args.report, args.provider, proxy=args.proxy)
+    generate_report(target_asset, args.report, args.provider, proxy=args.proxy, use_db=args.db)
 
 
 if __name__ == "__main__":
