@@ -395,7 +395,6 @@ class AlphaPrimeExecutor:
         if not self.quiver_key:
             self.payload["layer_4_smart_money"] = smart_money_data
             return
-            return
 
         import requests
         headers = {"Authorization": f"Bearer {self.quiver_key}", "Accept": "application/json"}
