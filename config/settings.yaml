@@ -1,0 +1,18 @@
+# Alpha Prime API Configuration
+
+api_keys:
+  gemini: "${GEMINI_API_KEY}"
+  fred: "${FRED_API_KEY}"
+  openai: "${OPENAI_API_KEY}"
+  quiver: "${QUIVER_API_KEY}"
+  tiingo: "${TIINGO_API_KEY}"
+
+data_settings:
+  cache_dir: "data/"
+  history_period: "6mo"
+  amt_interval: "1h"
+
+reporting:
+  language: "ar"
+  style: "institutional"
+  output_format: "markdown"

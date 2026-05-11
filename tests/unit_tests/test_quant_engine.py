@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from quant_engine import QuantEngine
+from src.intelligence_layers.quant_metrics import QuantEngine
 
 def test_quant_engine():
     # إنشاء بيانات وهمية
