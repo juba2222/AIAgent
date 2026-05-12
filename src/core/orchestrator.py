@@ -72,7 +72,7 @@ class AlphaPrimeExecutor:
         # دخل ثابت (Cost of Capital)
         "US10Y": "^TNX",
         "US30Y": "^TYX",
-        "US02Y": "^FVX", # Using 5Y Treasury Yield as a proxy for the curve calculation in yfinance context
+        "US02Y": "^IRX", # Using 13-Week Treasury Bill as a short-term proxy for yield curve calculations
         "TIPS": "TIP",
         "HY_SPREAD": "HYG",
         "TLT": "TLT",
@@ -94,7 +94,7 @@ class AlphaPrimeExecutor:
 
         # تقلب (Fear)
         "VIX": "^VIX",
-        "MOVE": "IEF",
+        "MOVE": "^MOVE",
 
         # رقمية (Alt Liquidity)
         "BTC": "BTC-USD",

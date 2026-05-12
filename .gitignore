@@ -5,6 +5,8 @@ __pycache__/
 
 # Data & Context
 alpha_prime_context.json
+alpha_prime_intelligence_db.json
+last_llm_context.json
 *.log
 
 # Environment & Keys

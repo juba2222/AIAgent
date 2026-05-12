@@ -57,20 +57,29 @@ class AMTEngine:
 
         if use_tpo or 'Volume' not in df.columns or float(vol_sum) == 0:
             # TPO Logic: Count occurrences of price in bins
-            profile = df.groupby('bin', observed=True).size()
+            # Use observed=False to include empty bins (Single Prints)
+            profile = df.groupby('bin', observed=False).size()
             profile_type = "TPO"
         else:
             # Volume Logic
-            volume_series = df['Volume']
-            if isinstance(volume_series, pd.DataFrame):
-                volume_series = volume_series.iloc[:, 0]
-            profile = df.groupby('bin', observed=True).apply(lambda x: volume_series.loc[x.index].sum())
+            # Use observed=False to include empty bins (Single Prints)
+            profile = df.groupby('bin', observed=False)['Volume'].sum().fillna(0)
+            if isinstance(profile, pd.DataFrame):
+                profile = profile.iloc[:, 0]
             profile_type = "Volume"
 
-        if profile.empty or profile.sum() == 0:
+        def safe_sum(s):
+            res = s.sum()
+            if isinstance(res, (pd.Series, pd.DataFrame)):
+                return res.sum()
+            return res
+
+        if profile.empty or float(safe_sum(profile)) == 0:
             return None
 
         poc_bin = profile.idxmax()
+        if isinstance(poc_bin, (pd.Series, pd.DataFrame)):
+            poc_bin = poc_bin.iloc[0]
         poc = (poc_bin.left + poc_bin.right) / 2
 
         total_metric = profile.sum()
